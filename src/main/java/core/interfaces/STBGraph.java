@@ -6,14 +6,13 @@ public interface STBGraph<V extends STBTerminal, E extends STBEdge> extends STBC
 
     Set<V> getAllVertexes();
     boolean addVertex(V vertex);
-    boolean addVertexes(V... vertexes);
+    boolean addVertexes(Set<V> vertexes);
     boolean removeVertex(V vertex);
-    boolean removeVertexes(V... vertexes);
+    boolean removeVertexes(Set<V> vertexes);
 
     Set<E> getAllEdges();
     boolean addEdge(E edge);
-    boolean addEdges(E... edges);
+    boolean addEdges(Set<E> edges);
     boolean removeEdge(E edge);
-    boolean removeEdges(E... edges);
-
+    boolean removeEdges(Set<E> edges);
 }
