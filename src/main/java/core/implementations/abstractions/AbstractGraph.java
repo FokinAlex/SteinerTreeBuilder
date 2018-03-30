@@ -8,8 +8,8 @@ import java.util.Set;
 
 public abstract class AbstractGraph<Terminal extends STBTerminal, Edge extends STBEdge> implements STBGraph<Terminal, Edge> {
 
-    private Set<Terminal> vertexes;
-    private Set<Edge> edges;
+    protected Set<Terminal> vertexes;
+    protected Set<Edge> edges;
 
     public Set<Terminal> getAllVertexes() {
         return this.vertexes;
