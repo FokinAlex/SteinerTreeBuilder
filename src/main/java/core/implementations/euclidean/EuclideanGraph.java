@@ -1,29 +1,17 @@
 package core.implementations.euclidean;
 
-import core.exceptions.IllegalComponentException;
-import core.implementations.abstractions.AbstractGraph;
-import core.interfaces.STBGraph;
+import core.implementations.abstractions.AbstractWeightedGraph;
 
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class EuclideanGraph<Terminal extends EuclideanTerminal, Edge extends EuclideanEdge> extends AbstractGraph<Terminal, Edge> {
+public class EuclideanGraph<Terminal extends EuclideanTerminal, Edge extends EuclideanEdge<Terminal, Weight>, Weight extends Double> extends AbstractWeightedGraph<Terminal, Edge, Weight> {
 
     // Default modifier here is for the package-private access
     EuclideanGraph() {
         // TODO: choose Set implementation
         this.vertexes = new HashSet<>();
         this.edges = new HashSet<>();
-    }
-
-    public double getLength() {
-        return this.edges.stream()
-                .map(edge -> EuclideanMetric.METRIC.apply(
-                        edge.getFirstEndpoint().getLocation(),
-                        edge.getSecondEndpoint().getLocation()))
-                .reduce(Double::sum)
-                .orElse(0.);
     }
 
     @Override
@@ -74,5 +62,15 @@ public class EuclideanGraph<Terminal extends EuclideanTerminal, Edge extends Euc
     @Override
     public boolean removeEdges(Set<Edge> edges) {
         return super.removeEdges(edges);
+    }
+
+    @Override
+    public Weight getWeight() {
+        return (Weight) this.edges.stream()
+                .map(e -> EuclideanMetric.METRIC.apply(
+                    e.getFirstEndpoint().getLocation(),
+                    e.getSecondEndpoint().getLocation()))
+                .reduce(Weight::sum)
+                .orElse(0.);
     }
 }

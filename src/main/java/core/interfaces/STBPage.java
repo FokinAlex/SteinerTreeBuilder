@@ -1,8 +1,10 @@
 package core.interfaces;
 
-public interface STBPage<T extends STBGraph> {
+import java.util.List;
 
-    T getData();
-    boolean setData(T data);
+public interface STBPage<Component extends STBComponent> {
 
+    List<Component> getAllComponents();
+    boolean addComponent(Component component);
+    boolean removeComponent(Component component);
 }

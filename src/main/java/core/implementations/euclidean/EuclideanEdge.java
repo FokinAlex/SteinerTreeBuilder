@@ -2,20 +2,15 @@ package core.implementations.euclidean;
 
 import core.exceptions.IllegalComponentException;
 import core.implementations.abstractions.AbstractEdge;
+import core.implementations.abstractions.AbstractWeightedEdge;
 import core.interfaces.STBEdge;
 
-public class EuclideanEdge<Terminal extends EuclideanTerminal> extends AbstractEdge<Terminal> {
+public class EuclideanEdge<Terminal extends EuclideanTerminal, Weight extends Double> extends AbstractWeightedEdge<Terminal, Weight> {
 
     // Default modifier here is for the package-private access
     EuclideanEdge(Terminal firstTerminal, Terminal secondTerminal) throws IllegalComponentException {
         setFirstEndpoint(firstTerminal);
         setSecondEndpoint(secondTerminal);
-    }
-
-    public double getLength() {
-        return EuclideanMetric.METRIC.apply(
-                this.getFirstEndpoint().getLocation(),
-                this.getSecondEndpoint().getLocation());
     }
 
     @Override
@@ -36,5 +31,12 @@ public class EuclideanEdge<Terminal extends EuclideanTerminal> extends AbstractE
     @Override
     public Terminal getSecondEndpoint() {
         return super.getSecondEndpoint();
+    }
+
+    @Override
+    public Weight getWeight() {
+        return (Weight) EuclideanMetric.METRIC.apply(
+                this.getFirstEndpoint().getLocation(),
+                this.getSecondEndpoint().getLocation());
     }
 }

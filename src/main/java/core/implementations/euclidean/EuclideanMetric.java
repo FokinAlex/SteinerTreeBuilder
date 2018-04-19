@@ -2,7 +2,7 @@ package core.implementations.euclidean;
 
 import core.implementations.abstractions.AbstractMetric;
 
-public class EuclideanMetric<Location extends EuclideanLocation, Result extends Double> extends AbstractMetric<Location, Result> {
+public final class EuclideanMetric<Location extends EuclideanLocation, Result extends Double> extends AbstractMetric<Location, Result> {
 
     public static final EuclideanMetric METRIC = new EuclideanMetric();
 
