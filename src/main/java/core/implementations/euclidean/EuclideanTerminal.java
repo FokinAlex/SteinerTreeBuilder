@@ -5,8 +5,7 @@ import core.implementations.abstractions.AbstractTerminal;
 
 public class EuclideanTerminal<Location extends EuclideanLocation> extends AbstractTerminal<Location> {
 
-    // Default modifier here is for the package-private access
-    EuclideanTerminal(Location location) throws IllegalLocationException {
+    public EuclideanTerminal(Location location) throws IllegalLocationException {
         this.setLocation(location);
     }
 
