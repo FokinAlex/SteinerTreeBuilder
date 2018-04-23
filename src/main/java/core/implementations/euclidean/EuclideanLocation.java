@@ -7,8 +7,7 @@ public class EuclideanLocation implements STBLocation {
     private double x;
     private double y;
 
-    // Default modifier here is for the package-private access
-    EuclideanLocation(double x, double y) {
+    public EuclideanLocation(double x, double y) {
         this.setX(x);
         this.setY(y);
     }

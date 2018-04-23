@@ -7,8 +7,7 @@ import java.util.Set;
 
 public class EuclideanGraph<Terminal extends EuclideanTerminal, Edge extends EuclideanEdge<Terminal, Weight>, Weight extends Double> extends AbstractWeightedGraph<Terminal, Edge, Weight> {
 
-    // Default modifier here is for the package-private access
-    EuclideanGraph() {
+    public EuclideanGraph() {
         // TODO: choose Set implementation
         this.vertexes = new HashSet<>();
         this.edges = new HashSet<>();

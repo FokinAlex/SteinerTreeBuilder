@@ -7,8 +7,7 @@ import core.interfaces.STBEdge;
 
 public class EuclideanEdge<Terminal extends EuclideanTerminal, Weight extends Double> extends AbstractWeightedEdge<Terminal, Weight> {
 
-    // Default modifier here is for the package-private access
-    EuclideanEdge(Terminal firstTerminal, Terminal secondTerminal) throws IllegalComponentException {
+    public EuclideanEdge(Terminal firstTerminal, Terminal secondTerminal) throws IllegalComponentException {
         setFirstEndpoint(firstTerminal);
         setSecondEndpoint(secondTerminal);
     }
