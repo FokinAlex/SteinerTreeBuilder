@@ -9,31 +9,8 @@ import java.io.*;
 public final class JsonUtils {
 
     private static final JSONParser PARSER = new JSONParser();
-    private static final JsonUtils JSONUTILS_OBJECT = new JsonUtils();
-
+   
     private JsonUtils() {}
-
-    public static JsonBuilder initJsonBuilder(){
-        return JSONUTILS_OBJECT.new JsonBuilder();
-    }
-
-    public class JsonBuilder {
-
-        private JSONObject jsonObject;
-
-        private JsonBuilder() {
-            jsonObject = new JSONObject();
-        }
-
-        public JsonBuilder put(Object key, Object value) {
-            this.jsonObject.put(key, value);
-            return this;
-        }
-
-        public JSONObject build() {
-            return this.jsonObject;
-        }
-    }
 
     public static void writeJsonToFile(JSONObject json, File file) throws IOException {
         FileWriter fileWriter = new FileWriter(file);
