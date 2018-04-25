@@ -1,8 +1,11 @@
 package gui;
 
+import appi.ci.ProjectController;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+
+import java.io.File;
 
 public class STBMainWindowController {
 
@@ -39,30 +42,34 @@ public class STBMainWindowController {
     @FXML Label leftStatus;
     @FXML Label rightStatus;
 
-
     // Actions:
     @FXML
     public boolean newProjectAction() {
         setLeftStatus("New project action");
+        // TODO: user must chooser project type
+        ProjectController.getNewProject(ProjectController.SIMPLE_PROJECT);
         return false;
     }
 
     @FXML
     public boolean openProjectAction() {
         setLeftStatus("Open project action");
+        // TODO: user must choose file
+        ProjectController.openProject();
         return false;
     }
 
     @FXML
     public boolean saveProjectAction() {
         setLeftStatus("Save project action");
-        return false;
+        // TODO: choose project type
+        return ProjectController.saveProject();
     }
 
     @FXML
     public boolean closeProjectAction() {
         setLeftStatus("Close project action");
-        return false;
+        return ProjectController.closeProject();
     }
 
     @FXML
@@ -112,12 +119,6 @@ public class STBMainWindowController {
         setLeftStatus("Add node action");
         return false;
     }
-
-
-
-    // TODO: do something else here
-
-
 
     private void setLeftStatus(String leftStatus) {
         this.leftStatus.setText("Last action: " + leftStatus);
