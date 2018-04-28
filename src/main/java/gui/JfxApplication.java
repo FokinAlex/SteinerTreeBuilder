@@ -9,11 +9,12 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class STBJfxApplication extends Application {
+public class JfxApplication extends Application {
 
     private static final String MW_FXML = "MainWindow.fxml";
+    private static final String SKIN_CSS = "stylesheets/stylesheets.css";
 
-    private STBMainWindowController controller;
+    private MainWindowController controller;
     private Parent rootElement;
     private Scene scene;
 
@@ -22,9 +23,10 @@ public class STBJfxApplication extends Application {
         final FXMLLoader loader = new FXMLLoader();
         final InputStream stream = getClass().getResourceAsStream(MW_FXML);
 
-        rootElement = loader.load(stream);
-        controller = loader.getController();
-        scene = new Scene(rootElement, 800, 600);
+        this.rootElement = loader.load(stream);
+        this.controller = loader.getController();
+        this.scene = new Scene(rootElement, 800, 600);
+        this.scene.getStylesheets().add(getClass().getResource(SKIN_CSS).toExternalForm());
 
         stage.setScene(scene);
         stage.show();
@@ -32,7 +34,7 @@ public class STBJfxApplication extends Application {
 
     //* TODO: add this to STBMain.java:
     public static void main(String[] args) {
-        STBJfxApplication.launch(args);
+        JfxApplication.launch(args);
     }
     // */
 }

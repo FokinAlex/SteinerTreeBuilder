@@ -4,14 +4,11 @@ import appi.ci.implementations.SimpleProject;
 import appi.ci.interfaces.Project;
 import core.exceptions.IllegalComponentException;
 import core.exceptions.IllegalLocationException;
-import core.exceptions.IllegalPageException;
 import core.implementations.GraphPage;
 import core.implementations.GraphSinglePageScheme;
 import core.implementations.euclidean.EuclideanGraph;
 import core.interfaces.STBGraph;
 import dai.PageDataAccess;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import org.json.simple.parser.ParseException;
 import utils.iou.FileChooserUtils;
 import utils.iou.JsonUtils;
@@ -30,8 +27,6 @@ public enum ProjectController {
             case SIMPLE_PROJECT:
                 try { // TODO: remove try
                     project = new SimpleProject(new GraphSinglePageScheme(new GraphPage(new EuclideanGraph())));
-                } catch (IllegalPageException e) {
-                    e.printStackTrace();
                 } catch (IllegalComponentException e) {
                     e.printStackTrace();
                 }
@@ -63,7 +58,7 @@ public enum ProjectController {
         return false;
     }
 
-    public static boolean openProject() {
+    public static Project openProject() {
         ProjectController.closeProject();
         // TODO: ownerWindow = MainWindow ?
         File projectFile = FileChooserUtils.getProjectFileChooser(null).showOpenDialog(null);
@@ -72,19 +67,19 @@ public enum ProjectController {
             try {
                 project = new SimpleProject(new GraphSinglePageScheme(new GraphPage(PageDataAccess.EUCLIDEAN.fromJson(JsonUtils.readJsonFromFile(projectFile)))));
                 project.setFile(new File(projectFile.getParentFile().getPath()));
-                return true;
+                return project;
             } catch (IOException e) {
                 // TODO: show some information to user
                 e.printStackTrace();
             } catch (ParseException e) {
                 // TODO: show some information to user
                 e.printStackTrace();
-            } catch (IllegalComponentException | IllegalLocationException | IllegalPageException e) {
+            } catch (IllegalComponentException | IllegalLocationException e) {
                 // TODO: show some information to user
                 e.printStackTrace();
             }
         }
-        return false;
+        return null;
     }
 
     public static boolean closeProject() {
