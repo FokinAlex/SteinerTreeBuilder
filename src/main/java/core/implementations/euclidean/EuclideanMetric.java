@@ -11,8 +11,8 @@ public final class EuclideanMetric<Location extends EuclideanLocation, Result ex
     @Override
     public Result apply(Location location1, Location location2) {
         return (Result) (Double) Math.sqrt(
-            (location1.getX() - location2.getX()) * (location1.getX() - location2.getX()) +
-            (location1.getY() - location2.getY()) * (location1.getY() - location2.getY())
+            (location1.getXProperty().get() - location2.getXProperty().get()) * (location1.getXProperty().get() - location2.getXProperty().get()) +
+            (location1.getYProperty().get() - location2.getYProperty().get()) * (location1.getYProperty().get() - location2.getYProperty().get())
         );
     }
 }

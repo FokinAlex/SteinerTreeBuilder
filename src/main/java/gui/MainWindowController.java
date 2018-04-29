@@ -33,6 +33,7 @@ public class MainWindowController {
     // "Project" menu:
     @FXML private Menu projectMenu;
     @FXML private MenuItem addTerminalMI;
+    @FXML private MenuItem addEdgeMI;
     // TODO: project menu
 
     // Panes:
@@ -137,6 +138,13 @@ public class MainWindowController {
             return true;
         }
         return false;
+    }
+
+    @FXML
+    public boolean addEdgeAction() {
+        setLeftStatus("Add edge action");
+        ((PagePane) projectViewPane.getContent()).edgeAditionModeOn();
+        return true;
     }
 
     private void setBindings() {

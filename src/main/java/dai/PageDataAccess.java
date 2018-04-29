@@ -1,6 +1,5 @@
 package dai;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
 import core.exceptions.IllegalComponentException;
 import core.exceptions.IllegalLocationException;
 import core.implementations.euclidean.EuclideanEdge;
@@ -36,8 +35,8 @@ public enum PageDataAccess {
                 JSONObject jTerminal = new JSONObject();
                 JSONObject jTerminalsValues = new JSONObject();
                 JSONObject jTerminalLocation = new JSONObject();
-                jTerminalLocation.put("x", terminal.getLocation().getX());
-                jTerminalLocation.put("y", terminal.getLocation().getY());
+                jTerminalLocation.put("x", terminal.getLocation().getXProperty().get());
+                jTerminalLocation.put("y", terminal.getLocation().getYProperty().get());
                 jTerminalsValues.put("id", id);
                 jTerminalsValues.put("type", terminal.type.toString());
                 jTerminalsValues.put("location", jTerminalLocation);
