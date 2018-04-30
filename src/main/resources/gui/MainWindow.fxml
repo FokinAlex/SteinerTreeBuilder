@@ -44,9 +44,19 @@
         <Menu fx:id="projectMenu" mnemonicParsing="false" text="Project">
           <items>
             <MenuItem fx:id="addTerminalMI" mnemonicParsing="false" onAction="#addTerminalAction" text="Add Terminal" />
-                  <MenuItem fx:id="addEdgeMI" mnemonicParsing="false" onAction="#addEdgeAction" text="Add Edge" />
+                  <MenuItem fx:id="addEdgeMI" mnemonicParsing="false" text="Add Edge" />
           </items>
         </Menu>
+            <Menu mnemonicParsing="false" text="Algorithms">
+               <items>
+                  <Menu mnemonicParsing="false" text="Steiner Problem">
+                     <items>
+                        <Menu fx:id="steinerExactAlgorithms" mnemonicParsing="false" text="Exact Algorithms" />
+                        <Menu fx:id="steinerHeuristicAlgorithms" mnemonicParsing="false" text="Heuristic Algorithms" />
+                     </items>
+                  </Menu>
+               </items>
+            </Menu>
       </menus>
     </MenuBar>
     <SplitPane dividerPositions="0.5" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
