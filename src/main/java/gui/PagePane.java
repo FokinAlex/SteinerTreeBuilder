@@ -1,8 +1,9 @@
 package gui;
 
+import appi.ci.interfaces.AlgorithmType;
 import core.implementations.GraphPage;
 import core.implementations.euclidean.EuclideanEdge;
-import core.implementations.euclidean.EuclideanTerminal;
+import core.interfaces.STBAlgorithm;
 import core.interfaces.STBEdge;
 import core.interfaces.STBTerminal;
 import javafx.beans.property.BooleanProperty;
@@ -24,6 +25,7 @@ public class PagePane extends AnchorPane {
 
     private BooleanProperty edgeAdditionMode = new SimpleBooleanProperty(false);
     private BooleanProperty hasSelectedTerminal = new SimpleBooleanProperty(false);
+    private BooleanProperty algorithmInProgress = new SimpleBooleanProperty(false);
 
     private StringProperty selectedTerminalXProperty;
     private StringProperty selectedTerminalYProperty;
@@ -33,7 +35,6 @@ public class PagePane extends AnchorPane {
         this.regularEdges = new ArrayList<>();
         this.page = page;
         this.page.getGraph().getAllVertexes().forEach(terminal -> {
-            // TODO: change to property ???
             PagePoint point = this.addRegularPoint(
                     ((STBTerminal) terminal).getLocation().getXProperty().get(),
                     ((STBTerminal) terminal).getLocation().getYProperty().get()
@@ -48,6 +49,20 @@ public class PagePane extends AnchorPane {
                         PageEdge regularEdge = this.addRegularEdge(firstEndpoint, secondEndpoint);
                         regularEdge.setEdge((STBEdge) edge);
         }})));
+    }
+
+    public void execute(AlgorithmType type) {
+        STBAlgorithm algorithm = type.getInstance(this.page.getGraph());
+        this.algorithmInProgress.bind(algorithm.inProgressProperty());
+        this.algorithmInProgress.addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                this.algorithmInProgress.unbind();
+                // TODO: this.algorithmInProgress.removeListener();
+            }
+        });
+        // TODO: run in new thread ?
+        Thread thread = new Thread(algorithm);
+        thread.start();
     }
 
     public void edgeAditionModeOn() {
@@ -108,6 +123,10 @@ public class PagePane extends AnchorPane {
 
     public BooleanProperty edgeAdditionModeProperty() {
         return this.edgeAdditionMode;
+    }
+
+    public BooleanProperty algorithmInProgressProperty() {
+        return this.algorithmInProgress;
     }
 
     public void setSelectedTerminalXProperty(StringProperty property) {

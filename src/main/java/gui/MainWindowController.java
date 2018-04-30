@@ -1,6 +1,7 @@
 package gui;
 
 import appi.ci.ProjectController;
+import appi.ci.SteinerExactAlgorithms;
 import appi.ci.interfaces.Project;
 import core.implementations.GraphPage;
 import javafx.fxml.FXML;
@@ -34,7 +35,10 @@ public class MainWindowController {
     @FXML private Menu projectMenu;
     @FXML private MenuItem addTerminalMI;
     @FXML private MenuItem addEdgeMI;
-    // TODO: project menu
+
+    // "Algorithms" menu:
+    @FXML private Menu steinerExactAlgorithms;
+    @FXML private Menu steinerHeuristicAlgorithms;
 
     // Panes:
     @FXML private ScrollPane projectViewPane;
@@ -52,6 +56,12 @@ public class MainWindowController {
     @FXML
     public void initialize() {
         this.terminalPropertiesPane.visibleProperty().setValue(false);
+        SteinerExactAlgorithms.ALGORITHMS.forEach((name, type) -> {
+            MenuItem menuItem = new MenuItem(name);
+            menuItem.setOnAction(event -> ((PagePane) this.projectViewPane.getContent()).execute(type));
+            this.steinerExactAlgorithms.getItems().add(menuItem);
+        });
+        // TODO: steinerEHeuristicAlgorithms init
     }
 
     @FXML

@@ -71,8 +71,19 @@ public class PagePoint extends StackPane {
     @Deprecated // Bad practice
     public void setTerminal(STBTerminal terminal) {
         this.terminal = terminal;
-        terminal.getLocation().getXProperty().bind(this.layoutXProperty());
-        terminal.getLocation().getYProperty().bind(this.layoutYProperty());
+        ((PagePane) this.getParent()).algorithmInProgressProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                terminal.getLocation().getXProperty().unbind();
+                terminal.getLocation().getYProperty().unbind();
+                this.layoutXProperty().bind(terminal.getLocation().getXProperty());
+                this.layoutYProperty().bind(terminal.getLocation().getYProperty());
+            } else {
+                this.layoutXProperty().unbind();
+                this.layoutYProperty().unbind();
+                terminal.getLocation().getXProperty().bind(this.layoutXProperty());
+                terminal.getLocation().getYProperty().bind(this.layoutYProperty());
+            }
+        });
     }
 
     @Deprecated // Bad practice
