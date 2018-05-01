@@ -1,6 +1,7 @@
 package core.interfaces;
 
 import core.exceptions.IllegalComponentException;
+import javafx.beans.property.DoubleProperty;
 
 public interface STBEdge<T extends STBTerminal> extends STBComponent {
 
@@ -9,4 +10,7 @@ public interface STBEdge<T extends STBTerminal> extends STBComponent {
 
     void setSecondEndpoint(T terminal) throws IllegalComponentException;
     T getSecondEndpoint();
+
+    DoubleProperty getLengthProperty();
+    double getLength();
 }

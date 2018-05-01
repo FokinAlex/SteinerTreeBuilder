@@ -1,11 +1,11 @@
 package core.implementations.euclidean;
 
-import core.implementations.abstractions.AbstractWeightedGraph;
+import core.implementations.abstractions.AbstractGraph;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class EuclideanGraph<Terminal extends EuclideanTerminal, Edge extends EuclideanEdge<Terminal, Weight>, Weight extends Double> extends AbstractWeightedGraph<Terminal, Edge, Weight> {
+public class EuclideanGraph<Terminal extends EuclideanTerminal, Edge extends EuclideanEdge<Terminal>> extends AbstractGraph<Terminal, Edge> {
 
     public EuclideanGraph() {
         // TODO: choose Set implementation
@@ -61,15 +61,5 @@ public class EuclideanGraph<Terminal extends EuclideanTerminal, Edge extends Euc
     @Override
     public boolean removeEdges(Set<Edge> edges) {
         return super.removeEdges(edges);
-    }
-
-    @Override
-    public Weight getWeight() {
-        return (Weight) this.edges.stream()
-                .map(e -> EuclideanMetric.METRIC.apply(
-                    e.getFirstEndpoint().getLocation(),
-                    e.getSecondEndpoint().getLocation()))
-                .reduce(Weight::sum)
-                .orElse(0.);
     }
 }

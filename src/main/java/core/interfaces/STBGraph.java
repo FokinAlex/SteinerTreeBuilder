@@ -15,4 +15,6 @@ public interface STBGraph<V extends STBTerminal, E extends STBEdge> extends STBC
     boolean addEdges(Set<E> edges);
     boolean removeEdge(E edge);
     boolean removeEdges(Set<E> edges);
+
+    double getWeight();
 }
