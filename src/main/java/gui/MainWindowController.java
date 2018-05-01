@@ -34,7 +34,7 @@ public class MainWindowController {
     // "Project" menu:
     @FXML private Menu projectMenu;
     @FXML private MenuItem addTerminalMI;
-    @FXML private MenuItem addEdgeMI;
+    @FXML private RadioMenuItem addEdgeRMI;
 
     // "Algorithms" menu:
     @FXML private Menu steinerExactAlgorithms;
@@ -43,10 +43,19 @@ public class MainWindowController {
     // Panes:
     @FXML private ScrollPane projectViewPane;
     @FXML private AnchorPane projectPropertiesPane;
-    @FXML private ScrollPane propertiesContainerPane;
-    @FXML private AnchorPane terminalPropertiesPane;
+    @FXML private ScrollPane terminalPropertiesPane;
     @FXML private TextField terminalXValue;
     @FXML private TextField terminalYValue;
+
+    @FXML private ScrollPane edgePropertiesPane;
+    @FXML private TextField edgeFirstEndpointXValue;
+    @FXML private TextField edgeFirstEndpointYValue;
+    @FXML private TextField edgeSecondEndpointXValue;
+    @FXML private TextField edgeSecondEndpointYValue;
+    @FXML private Label edgeLenghtValue;
+
+    @FXML private Button deleteTerminal;
+    @FXML private Button deleteEdge;
 
     // Footer:
     @FXML private Label leftStatus;
@@ -55,7 +64,8 @@ public class MainWindowController {
     // Actions:
     @FXML
     public void initialize() {
-        this.terminalPropertiesPane.visibleProperty().setValue(false);
+        this.terminalPropertiesPane.visibleProperty().set(false);
+        this.edgePropertiesPane.visibleProperty().set(false);
         SteinerExactAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
             menuItem.setOnAction(event -> ((PagePane) this.projectViewPane.getContent()).execute(type));
@@ -153,15 +163,36 @@ public class MainWindowController {
     @FXML
     public boolean addEdgeAction() {
         setLeftStatus("Add edge action");
-        ((PagePane) projectViewPane.getContent()).edgeAditionModeOn();
+        ((PagePane) projectViewPane.getContent()).edgeAdditionMode(this.addEdgeRMI.isSelected());
+        return true;
+    }
+
+    @FXML
+    private boolean deleteTerminalAction() {
+        setLeftStatus("Delete terminal action");
+        ((PagePane) projectViewPane.getContent()).deleteSelectedTerminal();
+        return true;
+    }
+
+    @FXML
+    private boolean deleteEdgeAction() {
+        setLeftStatus("Delete edge action");
+        ((PagePane) projectViewPane.getContent()).deleteSelectedEdge();
         return true;
     }
 
     private void setBindings() {
         terminalPropertiesPane.visibleProperty()
                 .bind(((PagePane) projectViewPane.getContent()).selectedTerminalProperty());
+        edgePropertiesPane.visibleProperty()
+                .bind(((PagePane) projectViewPane.getContent()).selectedEdgeProperty());
         ((PagePane) projectViewPane.getContent()).setSelectedTerminalXProperty(terminalXValue.textProperty());
         ((PagePane) projectViewPane.getContent()).setSelectedTerminalYProperty(terminalYValue.textProperty());
+        ((PagePane) projectViewPane.getContent()).setFirstTerminalXProperty(edgeFirstEndpointXValue.textProperty());
+        ((PagePane) projectViewPane.getContent()).setFirstTerminalYProperty(edgeFirstEndpointYValue.textProperty());
+        ((PagePane) projectViewPane.getContent()).setSecondTerminalXProperty(edgeSecondEndpointXValue.textProperty());
+        ((PagePane) projectViewPane.getContent()).setSecondTerminalYProperty(edgeSecondEndpointYValue.textProperty());
+        ((PagePane) projectViewPane.getContent()).setEdgeLengthProperty(edgeLenghtValue.textProperty());
     }
 
 

@@ -6,7 +6,6 @@ import core.implementations.euclidean.EuclideanTerminal;
 import core.interfaces.STBTerminal;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.css.PseudoClass;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -17,9 +16,9 @@ public class PagePoint extends StackPane {
     public static final double HALO_BORDER_OFFSET = 4.;
     public static final double HALO_SIZE = REGULAR_POINT_RADIUS * 2 + HALO_BORDER_OFFSET * 2;
 
-    private static final PseudoClass PSEUDO_CLASS_SELECTED = PseudoClass.getPseudoClass("selected");
-
     private BooleanProperty isSelected = new SimpleBooleanProperty(false);
+    private BooleanProperty isFirstEndpoint = new SimpleBooleanProperty(false);
+    private BooleanProperty isSecondEndpoint = new SimpleBooleanProperty(false);
 
     @Deprecated // Bad practice
     private STBTerminal terminal;
@@ -33,34 +32,38 @@ public class PagePoint extends StackPane {
 
         this.setOnMouseClicked(event -> {
             if (((PagePane) this.getParent()).edgeAdditionModeProperty().get() &&
-                ((PagePane) this.getParent()).selectedTerminalProperty().get() &&
-                (!this.equals(((PagePane) this.getParent()).getSelectedPoint()))) {
+                    ((PagePane) this.getParent()).selectedTerminalProperty().get() &&
+                    (!this.equals(((PagePane) this.getParent()).getSelectedPoint()))) {
                 ((PagePane) this.getParent()).addEdge(((PagePane) this.getParent()).getSelectedPoint(), this);
             }
-            ((PagePane) this.getParent()).select(this.isSelected.get() ? null : this);
+            ((PagePane) this.getParent()).selectPoint(this.isSelected.get() ? null : this);
         });
 
-        backgroundInit();
-        haloInit();
+        this.backgroundInit();
+        this.haloInit();
 
-        this.getChildren().addAll(halo, background);
+        this.getChildren().addAll(this.halo, this.background);
     }
 
     private void backgroundInit() {
-        background = new Circle(REGULAR_POINT_RADIUS);
-        // TODO: bind radius
-        background.centerXProperty().bind(this.layoutXProperty());
-        background.centerYProperty().bind(this.layoutYProperty());
-        background.getStyleClass().add(StylesheetsConstants.TERMINAL_BACKGROUND);
+        this.background = new Circle(REGULAR_POINT_RADIUS);
+        this.background.getStyleClass().add(StylesheetsConstants.TERMINAL_BACKGROUND);
+        this.isSelected.addListener((observable, oldValue, newValue) -> this.background.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_SELECTED, newValue));
     }
 
     private void haloInit() {
-        halo = new Rectangle(HALO_SIZE, HALO_SIZE);
-        halo.getStyleClass().add(StylesheetsConstants.TERMINAL_HALO);
-        halo.visibleProperty().bind(this.isSelected);
-        halo.xProperty().bind(this.layoutXProperty());
-        halo.yProperty().bind(this.layoutYProperty());
-        isSelected.addListener((observable, oldValue, newValue) -> halo.pseudoClassStateChanged(PSEUDO_CLASS_SELECTED, newValue));
+        this.halo = new Rectangle(HALO_SIZE, HALO_SIZE);
+        this.halo.visibleProperty().bind(this.isSelected);
+        this.halo.getStyleClass().add(StylesheetsConstants.HALO);
+        this.isFirstEndpoint.addListener((observable, oldValue, newValue) -> this.halo.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_FIRSTENDPOINT, newValue));
+        this.isSecondEndpoint.addListener((observable, oldValue, newValue) -> this.halo.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_SECONDENDPOINT, newValue));
+    }
+
+    public void delete() {
+        this.terminal.getLocation().getXProperty().unbind();
+        this.terminal.getLocation().getYProperty().unbind();
+        this.terminal = null;
+        this.unselect();
     }
 
     @Deprecated // Bad practice
@@ -71,17 +74,19 @@ public class PagePoint extends StackPane {
     @Deprecated // Bad practice
     public void setTerminal(STBTerminal terminal) {
         this.terminal = terminal;
+        this.terminal.getLocation().getXProperty().bind(this.layoutXProperty());
+        this.terminal.getLocation().getYProperty().bind(this.layoutYProperty());
         ((PagePane) this.getParent()).algorithmInProgressProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                terminal.getLocation().getXProperty().unbind();
-                terminal.getLocation().getYProperty().unbind();
-                this.layoutXProperty().bind(terminal.getLocation().getXProperty());
-                this.layoutYProperty().bind(terminal.getLocation().getYProperty());
+                this.terminal.getLocation().getXProperty().unbind();
+                this.terminal.getLocation().getYProperty().unbind();
+                this.layoutXProperty().bind(this.terminal.getLocation().getXProperty());
+                this.layoutYProperty().bind(this.terminal.getLocation().getYProperty());
             } else {
                 this.layoutXProperty().unbind();
                 this.layoutYProperty().unbind();
-                terminal.getLocation().getXProperty().bind(this.layoutXProperty());
-                terminal.getLocation().getYProperty().bind(this.layoutYProperty());
+                this.terminal.getLocation().getXProperty().bind(this.layoutXProperty());
+                this.terminal.getLocation().getYProperty().bind(this.layoutYProperty());
             }
         });
     }
@@ -102,5 +107,15 @@ public class PagePoint extends StackPane {
 
     public void unselect() {
         this.isSelected.set(false);
+        this.isFirstEndpoint.set(false);
+        this.isSecondEndpoint.set(false);
+    }
+
+    public void setIsFirstEndpoint(boolean isFirstEndpoint) {
+        this.isFirstEndpoint.set(isFirstEndpoint);
+    }
+
+    public void setIsSecondEndpoint(boolean isSecondEndpoint) {
+        this.isSecondEndpoint.set(isSecondEndpoint);
     }
 }

@@ -1,6 +1,6 @@
 .terminal-background {
 	-fx-fill: rgb(73, 84, 119);
-	-fx-opacity: 0.9;
+	-fx-opacity: 0.8;
 	-fx-stroke: null;
 	-fx-stroke-type: inside;
 	-fx-stroke-width: 1;
@@ -9,22 +9,44 @@
 }
 
 .terminal-background:selected {
-	-fx-fill: derive(rgb(249,247,250), -5%);
+	-fx-opacity: 1;
 }
 
-.terminal-halo {
+.halo {
 	-fx-stroke: deepskyblue;
 	-fx-stroke-type: inside;
 	-fx-stroke-line-cap: butt;
-	-fx-stroke-width: 1;
+	-fx-stroke-width: 2;
 	-fx-arc-width: 6;
 	-fx-arc-height: 6;
 	-fx-fill: null;
 	-fx-effect: dropshadow(one-pass-box, rgba(180, 180, 180), 5, 0, 1, 1);
 }
 
+.halo:firstendpoint {
+    -fx-stroke: rgb(230, 90, 90);
+}
+
+.halo:secondendpoint {
+    -fx-stroke: rgb(90, 230, 90);
+}
+
 .edge-background {
 	-fx-stroke: rgb(73, 84, 119);
 	-fx-opacity: 0.5;
 	-fx-stroke-width: 1;
+}
+
+.edge-selector {
+	-fx-fill: rgb(73, 84, 119);
+	-fx-stroke: null;
+	-fx-opacity: 0.8;
+	-fx-stroke-type: inside;
+	-fx-stroke-width: 1;
+	-fx-arc-width: 3;
+	-fx-arc-height: 3;
+}
+
+.edge-selector:selected {
+	-fx-opacity: 1;
 }

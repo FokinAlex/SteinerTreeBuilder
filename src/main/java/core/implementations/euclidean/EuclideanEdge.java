@@ -2,14 +2,14 @@ package core.implementations.euclidean;
 
 import core.exceptions.IllegalComponentException;
 import core.implementations.abstractions.AbstractEdge;
-import core.implementations.abstractions.AbstractWeightedEdge;
-import core.interfaces.STBEdge;
+import javafx.beans.property.DoubleProperty;
 
-public class EuclideanEdge<Terminal extends EuclideanTerminal, Weight extends Double> extends AbstractWeightedEdge<Terminal, Weight> {
+public class EuclideanEdge<Terminal extends EuclideanTerminal> extends AbstractEdge<Terminal> {
 
     public EuclideanEdge(Terminal firstTerminal, Terminal secondTerminal) throws IllegalComponentException {
         setFirstEndpoint(firstTerminal);
         setSecondEndpoint(secondTerminal);
+        this.lengthProperty = EuclideanMetric.METRIC.apply(firstTerminal.getLocation(), secondTerminal.getLocation());
     }
 
     @Override
@@ -33,9 +33,12 @@ public class EuclideanEdge<Terminal extends EuclideanTerminal, Weight extends Do
     }
 
     @Override
-    public Weight getWeight() {
-        return (Weight) EuclideanMetric.METRIC.apply(
-                this.getFirstEndpoint().getLocation(),
-                this.getSecondEndpoint().getLocation());
+    public DoubleProperty getLengthProperty() {
+        return super.getLengthProperty();
+    }
+
+    @Override
+    public double getLength() {
+        return getLengthProperty().get();
     }
 }
