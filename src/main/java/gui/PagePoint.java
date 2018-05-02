@@ -4,6 +4,7 @@ import core.exceptions.IllegalLocationException;
 import core.implementations.euclidean.EuclideanLocation;
 import core.implementations.euclidean.EuclideanTerminal;
 import core.interfaces.STBTerminal;
+import core.types.STBTerminalType;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.layout.StackPane;
@@ -74,6 +75,7 @@ public class PagePoint extends StackPane {
     @Deprecated // Bad practice
     public void setTerminal(STBTerminal terminal) {
         this.terminal = terminal;
+        if (((EuclideanTerminal) this.terminal).type == STBTerminalType.STEINER_TERMINAL) this.background.setRadius(6);
         this.terminal.getLocation().getXProperty().bind(this.layoutXProperty());
         this.terminal.getLocation().getYProperty().bind(this.layoutYProperty());
         ((PagePane) this.getParent()).algorithmInProgressProperty().addListener((observable, oldValue, newValue) -> {

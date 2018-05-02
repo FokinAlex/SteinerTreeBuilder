@@ -2,6 +2,7 @@ package gui;
 
 import appi.ci.ProjectController;
 import appi.ci.SteinerExactAlgorithms;
+import appi.ci.SteinerHeuristicAlgorithms;
 import appi.ci.interfaces.Project;
 import core.implementations.GraphPage;
 import javafx.fxml.FXML;
@@ -71,7 +72,11 @@ public class MainWindowController {
             menuItem.setOnAction(event -> ((PagePane) this.projectViewPane.getContent()).execute(type));
             this.steinerExactAlgorithms.getItems().add(menuItem);
         });
-        // TODO: steinerEHeuristicAlgorithms init
+        SteinerHeuristicAlgorithms.ALGORITHMS.forEach((name, type) -> {
+            MenuItem menuItem = new MenuItem(name);
+            menuItem.setOnAction(event -> ((PagePane) this.projectViewPane.getContent()).execute(type));
+            this.steinerHeuristicAlgorithms.getItems().add(menuItem);
+        });
     }
 
     @FXML
