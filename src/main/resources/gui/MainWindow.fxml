@@ -25,12 +25,12 @@
         <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
           <items>
             <MenuItem fx:id="newProjectMI" mnemonicParsing="false" onAction="#newProjectAction" text="New" />
-            <MenuItem fx:id="openProjectMI" mnemonicParsing="false" onAction="#openProjectAction" text="Open…" />
-            <MenuItem fx:id="closeProjectMI" mnemonicParsing="false" onAction="#closeProjectAction" text="Close" />
+            <MenuItem fx:id="openProjectMI" mnemonicParsing="false" onAction="#openProjectAction" text="Open" />
+            <MenuItem fx:id="closeProjectMI" disable="true" mnemonicParsing="false" onAction="#closeProjectAction" text="Close" />
             <MenuItem fx:id="saveProjectMI" mnemonicParsing="false" onAction="#saveProjectAction" text="Save" />
           </items>
         </Menu>
-        <Menu fx:id="editMenu" mnemonicParsing="false" text="Edit">
+        <Menu fx:id="editMenu" disable="true" mnemonicParsing="false" text="Edit">
           <items>
             <MenuItem fx:id="undoMI" mnemonicParsing="false" onAction="#undoAction" text="Undo" />
             <MenuItem fx:id="redoMI" mnemonicParsing="false" onAction="#redoAction" text="Redo" />
@@ -43,13 +43,13 @@
             <MenuItem fx:id="selectAllMI" mnemonicParsing="false" onAction="#selectAllAction" text="Select All" />
           </items>
         </Menu>
-        <Menu fx:id="projectMenu" mnemonicParsing="false" text="Project">
+        <Menu fx:id="projectMenu" disable="true" mnemonicParsing="false" text="Project">
           <items>
             <MenuItem fx:id="addTerminalMI" mnemonicParsing="false" onAction="#addTerminalAction" text="Add Terminal" />
                   <RadioMenuItem fx:id="addEdgeRMI" mnemonicParsing="false" onAction="#addEdgeAction" text="Add Edge" />
           </items>
         </Menu>
-            <Menu mnemonicParsing="false" text="Algorithms">
+            <Menu fx:id="algorithmsMenu" disable="true" mnemonicParsing="false" text="Algorithms">
                <items>
                   <Menu mnemonicParsing="false" text="Steiner Problem">
                      <items>

@@ -4,9 +4,7 @@ import appi.ci.interfaces.AlgorithmType;
 import core.interfaces.STBAlgorithm;
 import core.interfaces.STBComponent;
 import core.interfaces.STBExactAlgorithm;
-import core.interfaces.STBGraph;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +16,11 @@ public enum SteinerExactAlgorithms implements STBExactAlgorithm, AlgorithmType {
 
         @Override
         public BooleanProperty inProgressProperty() {
+            return null;
+        }
+
+        @Override
+        public Object getResult() {
             return null;
         }
 

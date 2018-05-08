@@ -27,6 +27,10 @@ public class GraphPage<Graph extends STBGraph, Component extends STBComponent> i
         return this.graph;
     }
 
+    public void setGraph(Graph graph) {
+        this.graph = graph;
+    }
+
     @Override
     public boolean addComponent(Component component) {
         if (component instanceof STBTerminal) return this.graph.addVertex((STBTerminal) component);

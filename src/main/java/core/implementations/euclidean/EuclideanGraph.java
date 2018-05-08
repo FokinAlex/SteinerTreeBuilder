@@ -71,6 +71,7 @@ public class EuclideanGraph<Terminal extends EuclideanTerminal, Edge extends Euc
         return super.removeEdges(edges);
     }
 
+    @Deprecated // TODO: swap this temporary solution with something
     @Override
     public EuclideanGraph clone() throws CloneNotSupportedException {
         EuclideanGraph clone = null;
@@ -80,8 +81,6 @@ public class EuclideanGraph<Terminal extends EuclideanTerminal, Edge extends Euc
             clone = (EuclideanGraph) PageDataAccess.EUCLIDEAN.fromJson(JsonUtils.readJsonFromFile(file));
         } catch (IOException | ParseException | IllegalComponentException | IllegalLocationException e) {
             e.printStackTrace();
-        } finally {
-            // TODO: clear file here
         }
         return clone;
     }
