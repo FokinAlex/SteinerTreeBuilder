@@ -5,6 +5,7 @@ import core.implementations.GraphPage;
 import core.implementations.euclidean.EuclideanEdge;
 import core.interfaces.STBAlgorithm;
 import core.interfaces.STBEdge;
+import core.interfaces.STBGraph;
 import core.interfaces.STBTerminal;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -49,21 +50,7 @@ public class PagePane extends AnchorPane {
         this.regularPoints = new ArrayList<>();
         this.regularEdges = new ArrayList<>();
         this.page = page;
-        this.page.getGraph().getAllVertexes().forEach(terminal -> {
-            PagePoint point = this.addRegularPoint(
-                    ((STBTerminal) terminal).getLocation().getXProperty().get(),
-                    ((STBTerminal) terminal).getLocation().getYProperty().get()
-            );
-            point.setTerminal((STBTerminal) terminal);
-        });
-        this.page.getGraph().getAllEdges().forEach(edge ->
-            regularPoints.forEach(firstEndpoint ->
-                regularPoints.forEach(secondEndpoint -> {
-                    if ((firstEndpoint.getTerminal()).equals(((EuclideanEdge) edge).getFirstEndpoint()) &&
-                        (secondEndpoint.getTerminal()).equals(((EuclideanEdge) edge).getSecondEndpoint())) {
-                        PageEdge regularEdge = this.addRegularEdge(firstEndpoint, secondEndpoint);
-                        regularEdge.setEdge((STBEdge) edge);
-        }})));
+        this.graphInit();
         this.edgeLengthDoubleProperty.addListener((observable, oldValue, newValue) -> edgeLengthStringProperty.set("Length: " + ((Math.round((Double) newValue * 1000) / 1000.))));
     }
 
@@ -74,6 +61,7 @@ public class PagePane extends AnchorPane {
             if (!newValue) {
                 this.algorithmInProgress.unbind();
                 // TODO: this.algorithmInProgress.removeListener();
+                // TODO: algorithm.getResult();
             }
         });
         Thread thread = new Thread(algorithm);
@@ -123,20 +111,6 @@ public class PagePane extends AnchorPane {
         this.selectedPoint.delete();
         this.selectPoint(null);
         this.page.getGraph().removeVertex(terminal);
-    }
-
-    private PagePoint addRegularPoint(double x, double y) {
-        PagePoint regularPoint = new PagePoint(x, y);
-        this.regularPoints.add(regularPoint);
-        this.getChildren().add(regularPoint);
-        return regularPoint;
-    }
-
-    private PageEdge addRegularEdge(PagePoint firstEndpoint, PagePoint secondEndpoint) {
-        PageEdge regularEdge = new PageEdge(firstEndpoint, secondEndpoint);
-        this.regularEdges.add(regularEdge);
-        this.getChildren().add(regularEdge);
-        return regularEdge;
     }
 
     public void selectEdge(PageEdge edge) {
@@ -229,5 +203,37 @@ public class PagePane extends AnchorPane {
 
     public void setEdgeLengthProperty(StringProperty property) {
         this.edgeLengthStringProperty = property;
+    }
+
+    private void graphInit() {
+        this.page.getGraph().getAllVertexes().forEach(terminal -> {
+            PagePoint point = this.addRegularPoint(
+                    ((STBTerminal) terminal).getLocation().getXProperty().get(),
+                    ((STBTerminal) terminal).getLocation().getYProperty().get()
+            );
+            point.setTerminal((STBTerminal) terminal);
+        });
+        this.page.getGraph().getAllEdges().forEach(edge ->
+            regularPoints.forEach(firstEndpoint ->
+                regularPoints.forEach(secondEndpoint -> {
+                    if ((firstEndpoint.getTerminal()).equals(((EuclideanEdge) edge).getFirstEndpoint()) &&
+                            (secondEndpoint.getTerminal()).equals(((EuclideanEdge) edge).getSecondEndpoint())) {
+                        PageEdge regularEdge = this.addRegularEdge(firstEndpoint, secondEndpoint);
+                        regularEdge.setEdge((STBEdge) edge);
+                    }})));
+    }
+
+    private PagePoint addRegularPoint(double x, double y) {
+        PagePoint regularPoint = new PagePoint(x, y);
+        this.regularPoints.add(regularPoint);
+        this.getChildren().add(regularPoint);
+        return regularPoint;
+    }
+
+    private PageEdge addRegularEdge(PagePoint firstEndpoint, PagePoint secondEndpoint) {
+        PageEdge regularEdge = new PageEdge(firstEndpoint, secondEndpoint);
+        this.regularEdges.add(regularEdge);
+        this.getChildren().add(regularEdge);
+        return regularEdge;
     }
 }

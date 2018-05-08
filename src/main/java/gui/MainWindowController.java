@@ -38,6 +38,7 @@ public class MainWindowController {
     @FXML private RadioMenuItem addEdgeRMI;
 
     // "Algorithms" menu:
+    @FXML private Menu algorithmsMenu;
     @FXML private Menu steinerExactAlgorithms;
     @FXML private Menu steinerHeuristicAlgorithms;
 
@@ -205,6 +206,8 @@ public class MainWindowController {
         if (project != null) {
             clearProjectViewPane();
             this.projectViewPane.setContent(new PagePane((GraphPage) project.getCurrentPage()));
+            this.algorithmsMenu.setDisable(false);
+            this.projectMenu.setDisable(false);
             return true;
         }
         return false;

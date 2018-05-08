@@ -2,7 +2,7 @@ package core.implementations.algorithms;
 
 import core.exceptions.IllegalComponentException;
 import core.exceptions.IllegalLocationException;
-import core.implementations.abstractions.AbstractAlgorithm;
+import core.implementations.abstractions.AbstractSteinerTreeAlgorithm;
 import core.implementations.euclidean.EuclideanEdge;
 import core.implementations.euclidean.EuclideanGraph;
 import core.implementations.euclidean.EuclideanLocation;
@@ -10,30 +10,27 @@ import core.implementations.euclidean.EuclideanTerminal;
 import core.interfaces.STBExactAlgorithm;
 import core.interfaces.STBTerminal;
 import core.types.STBTerminalType;
-import javafx.beans.property.Property;
 import javafx.util.Pair;
 
 import java.util.*;
 
-public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph> extends AbstractAlgorithm<Graph> implements STBExactAlgorithm<Graph> {
+public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph, Result extends EuclideanGraph> extends AbstractSteinerTreeAlgorithm<Graph, Result> implements STBExactAlgorithm<Graph, Result> {
 
     private List<EuclideanTerminal> sortedVertexes;
-    private EuclideanGraph currentTree;
-    private EuclideanGraph subCurrentTree;
-    private EuclideanGraph bestTree;
 
     public IncrementalOptimizationAlgorithm(Graph graph) {
         super(graph);
-        double meanX = (double) graph.getAllVertexes().stream()
+        if (this.argument.getAllVertexes().size() == 0) return;
+        double meanX = (double) this.argument.getAllVertexes().stream()
                 .map(vertex -> ((STBTerminal)vertex).getLocation().getXProperty().get())
                 .reduce((a, b) -> (double) a + (double) b)
-                .get() / graph.getAllVertexes().size();
-        double meanY = (double) graph.getAllVertexes().stream()
+                .get() / this.argument.getAllVertexes().size();
+        double meanY = (double) this.argument.getAllVertexes().stream()
                 .map(vertex -> ((STBTerminal)vertex).getLocation().getYProperty().get())
                 .reduce((a, b) -> (double) a + (double) b)
-                .get() / graph.getAllVertexes().size();
+                .get() / this.argument.getAllVertexes().size();
         Map<STBTerminal, Double> tempMap = new HashMap<>();
-        graph.getAllVertexes().forEach(vertex -> tempMap.put((STBTerminal) vertex, getDistance((STBTerminal) vertex, meanX, meanY)));
+        this.argument.getAllVertexes().forEach(vertex -> tempMap.put((STBTerminal) vertex, getDistance((STBTerminal) vertex, meanX, meanY)));
         List<Map.Entry<STBTerminal, Double>> tempList = new ArrayList(tempMap.entrySet());
         tempList.sort(Map.Entry.comparingByValue());
         this.sortedVertexes = new ArrayList<>();
@@ -42,32 +39,47 @@ public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph> exte
 
     @Override
     public void run() {
+        EuclideanGraph currentTree;
+        EuclideanGraph subCurrentTree;
+        EuclideanGraph bestTree;
         this.inProgressProperty().set(true);
-        if (sortedVertexes.size() > 2) {
-            this.currentTree = localOptimization(this.sortedVertexes.get(0), this.sortedVertexes.get(1), this.sortedVertexes.get(2));
+        if (this.argument.getAllVertexes().size() > 2) {
+            currentTree = localOptimization(this.sortedVertexes.get(0), this.sortedVertexes.get(1), this.sortedVertexes.get(2));
             for (int i = 3; i < this.sortedVertexes.size(); i++) {
-                int finalI = i;
-                this.bestTree = new EuclideanGraph() { @Override public double getWeight() { return Double.MAX_VALUE; }};
+                bestTree = new EuclideanGraph() { @Override public double getWeight() { return Double.POSITIVE_INFINITY; }};
                 Iterator<EuclideanEdge> iterator = currentTree.getAllEdges().iterator();
                 while (iterator.hasNext()) {
                     EuclideanEdge edge = iterator.next();
-                    this.subCurrentTree = clone(currentTree);
+                    subCurrentTree = clone(currentTree);
                     localOptimization(
-                            this.subCurrentTree,
+                            subCurrentTree,
                             edge.getFirstEndpoint().getLocation().getXProperty().get(),
                             edge.getFirstEndpoint().getLocation().getYProperty().get(),
                             edge.getSecondEndpoint().getLocation().getXProperty().get(),
                             edge.getSecondEndpoint().getLocation().getYProperty().get(),
-                            sortedVertexes.get(finalI)
+                            sortedVertexes.get(i)
                     );
-                    if (this.subCurrentTree.getWeight() < this.bestTree.getWeight()) bestTree = clone(subCurrentTree);
+                    if (subCurrentTree.getWeight() < bestTree.getWeight()) bestTree = clone(subCurrentTree);
                 }
-                this.currentTree = clone(bestTree);
+                currentTree = clone(bestTree);
             }
+            result = (Result) currentTree;
+        } else {
+            if (this.argument.getAllVertexes().size() == 2 && this.argument.getAllEdges().size() == 0) {
+                Iterator iterator = this.argument.getAllVertexes().iterator();
+                try {
+                    this.argument.addEdge(new EuclideanEdge((EuclideanTerminal) iterator.next(), (EuclideanTerminal) iterator.next()));
+                } catch (IllegalComponentException e) {
+                    e.printStackTrace();
+                }
+            }
+            this.result = (Result) this.argument;
         }
+        // TODO: this.clone(this.result) if needful
         this.inProgressProperty().set(false);
     }
 
+    @Deprecated // Go to graph.clone()
     private static EuclideanGraph clone(EuclideanGraph graph) {
         try {
             return graph.clone();
@@ -77,6 +89,7 @@ public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph> exte
         }
     }
 
+    // TODO: use localOptimization(point, point, point) inside
     private static EuclideanGraph localOptimization(EuclideanGraph graph, double x1, double y1, double x2, double y2, EuclideanTerminal newPoint) {
         final EuclideanTerminal[] points = new EuclideanTerminal[2];
         graph.getAllVertexes().forEach(terminal -> {

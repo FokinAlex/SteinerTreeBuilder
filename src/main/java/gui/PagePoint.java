@@ -78,19 +78,20 @@ public class PagePoint extends StackPane {
         if (((EuclideanTerminal) this.terminal).type == STBTerminalType.STEINER_TERMINAL) this.background.setRadius(6);
         this.terminal.getLocation().getXProperty().bind(this.layoutXProperty());
         this.terminal.getLocation().getYProperty().bind(this.layoutYProperty());
-        ((PagePane) this.getParent()).algorithmInProgressProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                this.terminal.getLocation().getXProperty().unbind();
-                this.terminal.getLocation().getYProperty().unbind();
-                this.layoutXProperty().bind(this.terminal.getLocation().getXProperty());
-                this.layoutYProperty().bind(this.terminal.getLocation().getYProperty());
-            } else {
-                this.layoutXProperty().unbind();
-                this.layoutYProperty().unbind();
-                this.terminal.getLocation().getXProperty().bind(this.layoutXProperty());
-                this.terminal.getLocation().getYProperty().bind(this.layoutYProperty());
-            }
-        });
+//      TODO: if something must change in real time
+//        ((PagePane) this.getParent()).algorithmInProgressProperty().addListener((observable, oldValue, newValue) -> {
+//            if (newValue) {
+//                this.terminal.getLocation().getXProperty().unbind();
+//                this.terminal.getLocation().getYProperty().unbind();
+//                this.layoutXProperty().bind(this.terminal.getLocation().getXProperty());
+//                this.layoutYProperty().bind(this.terminal.getLocation().getYProperty());
+//            } else {
+//                this.layoutXProperty().unbind();
+//                this.layoutYProperty().unbind();
+//                this.terminal.getLocation().getXProperty().bind(this.layoutXProperty());
+//                this.terminal.getLocation().getYProperty().bind(this.layoutYProperty());
+//            }
+//        });
     }
 
     @Deprecated // Bad practice

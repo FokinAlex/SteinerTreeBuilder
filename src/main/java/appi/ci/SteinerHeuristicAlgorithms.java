@@ -5,10 +5,8 @@ import core.implementations.algorithms.IncrementalOptimizationAlgorithm;
 import core.implementations.euclidean.EuclideanGraph;
 import core.interfaces.STBAlgorithm;
 import core.interfaces.STBComponent;
-import core.interfaces.STBGraph;
 import core.interfaces.STBHeuristicAlgorithm;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +31,12 @@ public enum SteinerHeuristicAlgorithms implements STBHeuristicAlgorithm, Algorit
         public BooleanProperty inProgressProperty() {
             return this.algorithm.inProgressProperty();
         }
+
+        @Override
+        public EuclideanGraph getResult() {
+            return this.algorithm.getResult();
+        }
+
     };
 
     public static Map<String, SteinerHeuristicAlgorithms> ALGORITHMS = new HashMap<String, SteinerHeuristicAlgorithms>() {{
