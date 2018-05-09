@@ -10,8 +10,10 @@ import core.interfaces.STBTerminal;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.layout.AnchorPane;
+import utils.DialogUtils;
 import utils.vuu.StringDoubleConverter;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -60,8 +62,7 @@ public class PagePane extends AnchorPane {
         this.algorithmInProgress.addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 this.algorithmInProgress.unbind();
-                // TODO: this.algorithmInProgress.removeListener();
-                // TODO: algorithm.getResult();
+                // TODO: algorithm.getResult() -> report
             }
         });
         Thread thread = new Thread(algorithm);
@@ -78,7 +79,7 @@ public class PagePane extends AnchorPane {
 
     public void addTerminal(double x, double y) {
         PagePoint point = this.addRegularPoint(x, y);
-        this.page.getGraph().addVertex(point.genTerminal(x, y));
+        this.page.getGraph().addVertex(point.genTerminal(x, y, page.getGraph()));
     }
 
     public void addEdge(PagePoint firstEndpoint, PagePoint secondEndpoint) {

@@ -2,7 +2,7 @@ package core.interfaces;
 
 import java.util.Set;
 
-public interface STBGraph<V extends STBTerminal, E extends STBEdge> extends STBComponent {
+public interface STBGraph<V extends STBTerminal, E extends STBEdge> extends STBComponent, Cloneable {
 
     Set<V> getAllVertexes();
     boolean addVertex(V vertex);

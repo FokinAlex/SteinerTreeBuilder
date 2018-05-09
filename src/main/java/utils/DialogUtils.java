@@ -1,6 +1,10 @@
 package utils;
 
 
+import core.exceptions.IllegalComponentException;
+import core.implementations.GraphPage;
+import core.interfaces.STBGraph;
+import gui.PagePane;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -42,5 +46,20 @@ public final class DialogUtils {
     public static Pair<Double, Double> showNewEuclideanTerminalDialog() {
         Optional<Pair<Double, Double>> optional = NEW_EUCLIDEAN_TERMINAL_DIALOG.showAndWait();
         return optional.isPresent() ? optional.get() : null;
+    }
+
+    // TODO: remove or swap with something more useful
+    public static void showResults(STBGraph result) {
+        new Dialog() {{
+            this.setTitle("Results");
+//            ButtonType okType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+//            this.getDialogPane().getButtonTypes().addAll(okType, ButtonType.CANCEL);
+            try {
+                this.getDialogPane().setContent(new PagePane(new GraphPage(result)));
+            } catch (IllegalComponentException e) {
+                e.printStackTrace();
+            }
+            // this.setResultConverter(button -> okType.equals(button) ? new Pair<>(Double.valueOf(xValue.getText()), Double.valueOf(yValue.getText())) : null);
+        }}.show();
     }
 }

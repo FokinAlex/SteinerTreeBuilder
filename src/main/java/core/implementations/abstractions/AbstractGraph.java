@@ -74,4 +74,7 @@ public abstract class AbstractGraph<Terminal extends STBTerminal, Edge extends S
                 .reduce((a, b) -> a + b)
                 .get();
     }
+
+    @Override
+    protected abstract STBGraph clone() throws CloneNotSupportedException;
 }

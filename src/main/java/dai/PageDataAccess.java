@@ -1,7 +1,5 @@
 package dai;
 
-import core.exceptions.IllegalComponentException;
-import core.exceptions.IllegalLocationException;
 import core.implementations.euclidean.EuclideanEdge;
 import core.implementations.euclidean.EuclideanGraph;
 import core.implementations.euclidean.EuclideanLocation;
@@ -12,8 +10,9 @@ import core.types.STBTerminalType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public enum PageDataAccess {
     // TODO: this need some fragmentation when more then one
@@ -23,34 +22,30 @@ public enum PageDataAccess {
             JSONObject root = new JSONObject();
             JSONObject jGraph = new JSONObject();
             JSONArray jTerminals = new JSONArray();
-            Map<Integer, EuclideanTerminal> terminals = new HashMap<>();
-            graph.getAllVertexes().forEach(terminal -> terminals.put(terminals.size(), (EuclideanTerminal) terminal));
             JSONArray jEdges = new JSONArray();
-            Set<EuclideanEdge> edges = new HashSet<>();
-            graph.getAllEdges().forEach(edge -> edges.add((EuclideanEdge) edge));
 
             root.put("graph", jGraph);
             jGraph.put("terminals", jTerminals);
-            terminals.forEach((id, terminal) -> {
+            graph.getAllVertexes().forEach(terminal -> {
                 JSONObject jTerminal = new JSONObject();
                 JSONObject jTerminalsValues = new JSONObject();
                 JSONObject jTerminalLocation = new JSONObject();
-                jTerminalLocation.put("x", terminal.getLocation().getXProperty().get());
-                jTerminalLocation.put("y", terminal.getLocation().getYProperty().get());
-                jTerminalsValues.put("id", id);
-                jTerminalsValues.put("type", terminal.type.toString());
+                jTerminalLocation.put("x", ((EuclideanTerminal) terminal).getLocation().getXProperty().get());
+                jTerminalLocation.put("y", ((EuclideanTerminal) terminal).getLocation().getYProperty().get());
+                jTerminalsValues.put("id", ((EuclideanTerminal) terminal).getId());
+                jTerminalsValues.put("type", ((EuclideanTerminal) terminal).type.toString());
                 jTerminalsValues.put("location", jTerminalLocation);
                 jTerminal.put("terminal", jTerminalsValues);
                 jTerminals.add(jTerminal);
             });
             jGraph.put("edges", jEdges);
-            edges.forEach(edge -> {
+            graph.getAllEdges().forEach(edge -> {
                 JSONObject jEdge = new JSONObject();
                 JSONObject jEdgesValues = new JSONObject();
-                jEdgesValues.put("type", edge.type.toString());
-                terminals.forEach((id, terminal) -> {
-                    if(edge.getFirstEndpoint().equals(terminal)) jEdgesValues.put("firstendpoint", id);
-                    if(edge.getSecondEndpoint().equals(terminal)) jEdgesValues.put("secondendpoint", id);
+                jEdgesValues.put("type", ((EuclideanEdge) edge).type.toString());
+                graph.getAllVertexes().forEach(terminal -> {
+                    if(((EuclideanEdge) edge).getFirstEndpoint().equals(terminal)) jEdgesValues.put("firstendpoint", ((EuclideanTerminal) terminal).getId());
+                    if(((EuclideanEdge) edge).getSecondEndpoint().equals(terminal)) jEdgesValues.put("secondendpoint", ((EuclideanTerminal) terminal).getId());
                 });
                 jEdge.put("edge", jEdgesValues);
                 jEdges.add(jEdge);
@@ -59,12 +54,11 @@ public enum PageDataAccess {
         }
 
         @Override
-        public STBGraph fromJson(JSONObject json) throws IllegalLocationException, IllegalComponentException {
+        public STBGraph fromJson(JSONObject json) {
             EuclideanGraph graph = new EuclideanGraph();
-            Map<Integer, EuclideanTerminal> terminals = new HashMap<>();
+            Set<EuclideanTerminal> terminals = new HashSet<>();
             EuclideanTerminal currentTerminal;
             Set<EuclideanEdge> edges = new HashSet<>();
-            EuclideanEdge currentEdge;
 
             JSONObject jGraph = (JSONObject) json.get("graph");
             JSONArray jTerminals = (JSONArray) jGraph.get("terminals");
@@ -72,14 +66,14 @@ public enum PageDataAccess {
             iterator = jTerminals.iterator();
             while (iterator.hasNext()) {
                 JSONObject jTerminal = (JSONObject) iterator.next().get("terminal");
-                Integer jTerminalId = ((Long) jTerminal.get("id")).intValue();
+                Long jTerminalId = (Long) jTerminal.get("id");
                 String jTerminalType = (String) jTerminal.get("type");
                 JSONObject jTerminalLocation = (JSONObject) jTerminal.get("location");
                 Double jTerminalLocationX = (Double) jTerminalLocation.get("x");
                 Double jTerminalLocationY = (Double) jTerminalLocation.get("y");
-                currentTerminal = new EuclideanTerminal(new EuclideanLocation(jTerminalLocationX, jTerminalLocationY));
+                currentTerminal = new EuclideanTerminal(new EuclideanLocation(jTerminalLocationX, jTerminalLocationY), jTerminalId);
                 currentTerminal.type = STBTerminalType.valueOf(jTerminalType);
-                terminals.put(jTerminalId, currentTerminal);
+                terminals.add(currentTerminal);
             }
             JSONArray jEdges = (JSONArray) jGraph.get("edges");
             iterator = jEdges.iterator();
@@ -88,16 +82,21 @@ public enum PageDataAccess {
                 String jEdgeType = (String) jEdge.get("type");
                 Integer jEdgeFirstEndpoint = ((Long) jEdge.get("firstendpoint")).intValue();
                 Integer jEdgeSecondEndpoint = ((Long) jEdge.get("secondendpoint")).intValue();
-                currentEdge = new EuclideanEdge(terminals.get(jEdgeFirstEndpoint), terminals.get(jEdgeSecondEndpoint));
-                currentEdge.type = STBEdgeType.valueOf(jEdgeType);
-                edges.add(currentEdge);
+                terminals.forEach(firstEndpoint ->
+                    terminals.forEach(secondEndpoint -> {
+                        if (firstEndpoint.getId() == jEdgeFirstEndpoint && secondEndpoint.getId() == jEdgeSecondEndpoint) {
+                            EuclideanEdge currentEdge = new EuclideanEdge(firstEndpoint, secondEndpoint);
+                            currentEdge.type = STBEdgeType.valueOf(jEdgeType);
+                            edges.add(currentEdge);
+                        }
+                }));
             }
-            graph.addVertexes(terminals.values().stream().collect(Collectors.toSet()));
+            graph.addVertexes(terminals);
             graph.addEdges(edges);
             return graph;
         }
     };
 
     public abstract JSONObject toJson(STBGraph graph);
-    public abstract STBGraph fromJson(JSONObject json) throws IllegalLocationException, IllegalComponentException;
+    public abstract STBGraph fromJson(JSONObject json);
 }

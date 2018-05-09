@@ -16,10 +16,13 @@ public final class JsonUtils {
         FileWriter fileWriter = new FileWriter(file);
         fileWriter.write(json.toJSONString());
         fileWriter.flush();
+        fileWriter.close();
     }
 
     public static JSONObject readJsonFromFile(File file) throws IOException, ParseException {
         FileReader fileReader = new FileReader(file);
-        return (JSONObject) PARSER.parse(fileReader);
+        JSONObject result = (JSONObject) PARSER.parse(fileReader);
+        fileReader.close();
+        return result;
     }
 }

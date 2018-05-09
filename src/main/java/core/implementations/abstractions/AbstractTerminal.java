@@ -1,5 +1,6 @@
 package core.implementations.abstractions;
 
+import com.sun.istack.internal.NotNull;
 import core.exceptions.IllegalLocationException;
 import core.interfaces.STBLocation;
 import core.interfaces.STBTerminal;
@@ -7,16 +8,26 @@ import core.types.STBTerminalType;
 
 public abstract class AbstractTerminal<Location extends STBLocation> implements STBTerminal<Location> {
 
-    private Location location;
+    protected long id;
+    protected Location location;
     public STBTerminalType type = STBTerminalType.SIMPLE_TERMINAL;
 
+    public AbstractTerminal(@NotNull Location location, long id) {
+        this.location = location;
+        this.id = id;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
     public Location getLocation() {
         return this.location;
     }
 
-    public void setLocation(Location location) throws IllegalLocationException {
-        if(location == null) throw new IllegalLocationException("Location can not be null");
-        this.location = location;
-    }
+    @Override
+    protected abstract STBTerminal clone() throws CloneNotSupportedException;
 }
 

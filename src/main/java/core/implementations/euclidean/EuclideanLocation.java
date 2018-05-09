@@ -8,11 +8,8 @@ public class EuclideanLocation extends AbstractLocation {
         super(x, y);
     }
 
-    public void setX(double x) {
-        this.xProperty.set(x);
-    }
-
-    public void setY(double y) {
-        this.yProperty.set(y);
+    @Override
+    public EuclideanLocation clone() throws CloneNotSupportedException {
+        return new EuclideanLocation(this.xProperty.get(), this.yProperty.get());
     }
 }

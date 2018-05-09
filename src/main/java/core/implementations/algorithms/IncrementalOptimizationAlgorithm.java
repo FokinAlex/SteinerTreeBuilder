@@ -1,16 +1,17 @@
 package core.implementations.algorithms;
 
-import core.exceptions.IllegalComponentException;
-import core.exceptions.IllegalLocationException;
 import core.implementations.abstractions.AbstractSteinerTreeAlgorithm;
 import core.implementations.euclidean.EuclideanEdge;
 import core.implementations.euclidean.EuclideanGraph;
 import core.implementations.euclidean.EuclideanLocation;
 import core.implementations.euclidean.EuclideanTerminal;
 import core.interfaces.STBExactAlgorithm;
+import core.interfaces.STBGraph;
 import core.interfaces.STBTerminal;
 import core.types.STBTerminalType;
 import javafx.util.Pair;
+import utils.IdUtils;
+import utils.iou.JsonUtils;
 
 import java.util.*;
 
@@ -42,9 +43,15 @@ public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph, Resu
         EuclideanGraph currentTree;
         EuclideanGraph subCurrentTree;
         EuclideanGraph bestTree;
+        IdUtils.setGraph(this.argument);
         this.inProgressProperty().set(true);
         if (this.argument.getAllVertexes().size() > 2) {
-            currentTree = localOptimization(this.sortedVertexes.get(0), this.sortedVertexes.get(1), this.sortedVertexes.get(2));
+            currentTree = new EuclideanGraph(){{
+                this.vertexes.add(sortedVertexes.get(0));
+                this.vertexes.add(sortedVertexes.get(1));
+                this.vertexes.add(sortedVertexes.get(2));
+            }};
+            localOptimization(currentTree, this.sortedVertexes.get(0), this.sortedVertexes.get(1), this.sortedVertexes.get(2));
             for (int i = 3; i < this.sortedVertexes.size(); i++) {
                 bestTree = new EuclideanGraph() { @Override public double getWeight() { return Double.POSITIVE_INFINITY; }};
                 Iterator<EuclideanEdge> iterator = currentTree.getAllEdges().iterator();
@@ -53,10 +60,8 @@ public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph, Resu
                     subCurrentTree = clone(currentTree);
                     localOptimization(
                             subCurrentTree,
-                            edge.getFirstEndpoint().getLocation().getXProperty().get(),
-                            edge.getFirstEndpoint().getLocation().getYProperty().get(),
-                            edge.getSecondEndpoint().getLocation().getXProperty().get(),
-                            edge.getSecondEndpoint().getLocation().getYProperty().get(),
+                            edge.getFirstEndpoint().getId(),
+                            edge.getSecondEndpoint().getId(),
                             sortedVertexes.get(i)
                     );
                     if (subCurrentTree.getWeight() < bestTree.getWeight()) bestTree = clone(subCurrentTree);
@@ -67,19 +72,13 @@ public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph, Resu
         } else {
             if (this.argument.getAllVertexes().size() == 2 && this.argument.getAllEdges().size() == 0) {
                 Iterator iterator = this.argument.getAllVertexes().iterator();
-                try {
-                    this.argument.addEdge(new EuclideanEdge((EuclideanTerminal) iterator.next(), (EuclideanTerminal) iterator.next()));
-                } catch (IllegalComponentException e) {
-                    e.printStackTrace();
-                }
+                this.argument.addEdge(new EuclideanEdge((EuclideanTerminal) iterator.next(), (EuclideanTerminal) iterator.next()));
             }
             this.result = (Result) this.argument;
         }
-        // TODO: this.clone(this.result) if needful
         this.inProgressProperty().set(false);
     }
 
-    @Deprecated // Go to graph.clone()
     private static EuclideanGraph clone(EuclideanGraph graph) {
         try {
             return graph.clone();
@@ -89,73 +88,42 @@ public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph, Resu
         }
     }
 
-    // TODO: use localOptimization(point, point, point) inside
-    private static EuclideanGraph localOptimization(EuclideanGraph graph, double x1, double y1, double x2, double y2, EuclideanTerminal newPoint) {
+    private static void localOptimization(EuclideanGraph graph, long point1_id, long point2_id, EuclideanTerminal newPoint) {
         final EuclideanTerminal[] points = new EuclideanTerminal[2];
         graph.getAllVertexes().forEach(terminal -> {
-            if (((EuclideanTerminal) terminal).getLocation().getXProperty().get() == x1 &&
-                    ((EuclideanTerminal) terminal).getLocation().getYProperty().get() == y1) points[0] = (EuclideanTerminal) terminal;
-            if (((EuclideanTerminal) terminal).getLocation().getXProperty().get() == x2 &&
-                    ((EuclideanTerminal) terminal).getLocation().getYProperty().get() == y2) points[1] = (EuclideanTerminal) terminal;
+            if (((EuclideanTerminal) terminal).getId() == point1_id) points[0] = (EuclideanTerminal) terminal;
+            if (((EuclideanTerminal) terminal).getId() == point2_id) points[1] = (EuclideanTerminal) terminal;
         });
         EuclideanTerminal point1 = points[0];
         EuclideanTerminal point2 = points[1];
-        EuclideanTerminal steinerPoint = steinerPoint(points[0], points[1], newPoint);
         Iterator<EuclideanEdge> iterator = graph.getAllEdges().iterator();
         while (iterator.hasNext()) {
             EuclideanEdge edge = iterator.next();
-            if (edge.getFirstEndpoint().equals(point1) && edge.getSecondEndpoint().equals(point2)) iterator.remove();
+            if (edge.getFirstEndpoint().equals(point1) && edge.getSecondEndpoint().equals(point2)) {
+                iterator.remove();
+                break;
+            }
         }
         graph.addVertex(newPoint);
-        try {
-            if (point1.equals(steinerPoint)) {
-                graph.addEdge(new EuclideanEdge(point2, point1));
-                graph.addEdge(new EuclideanEdge(newPoint, point1));
-            } else if (point2.equals(steinerPoint)) {
-                graph.addEdge(new EuclideanEdge(point1, point2));
-                graph.addEdge(new EuclideanEdge(newPoint, point2));
-            } else if (newPoint.equals(steinerPoint)) {
-                graph.addEdge(new EuclideanEdge(point1, newPoint));
-                graph.addEdge(new EuclideanEdge(point2, newPoint));
-            } else {
-                graph.addEdge(new EuclideanEdge(point1, steinerPoint));
-                graph.addEdge(new EuclideanEdge(point2, steinerPoint));
-                graph.addEdge(new EuclideanEdge(newPoint, steinerPoint));
-                graph.addVertex(steinerPoint);
-            }
-            return graph;
-        } catch (IllegalComponentException e) {
-            e.printStackTrace();
-            return null;
-        }
+        localOptimization(graph, point1, point2, newPoint);
     }
 
-    private static EuclideanGraph localOptimization(EuclideanTerminal point1, EuclideanTerminal point2, EuclideanTerminal point3) {
+    private static void localOptimization(EuclideanGraph graph, EuclideanTerminal point1, EuclideanTerminal point2, EuclideanTerminal point3) {
         EuclideanTerminal steinerPoint = steinerPoint(point1, point2, point3);
-        EuclideanGraph result = new EuclideanGraph();
-        result.addVertex(point1);
-        result.addVertex(point2);
-        result.addVertex(point3);
-        try {
-            if (point1.equals(steinerPoint)) {
-                result.addEdge(new EuclideanEdge(point2, point1));
-                result.addEdge(new EuclideanEdge(point3, point1));
-            } else if (point2.equals(steinerPoint)) {
-                result.addEdge(new EuclideanEdge(point1, point2));
-                result.addEdge(new EuclideanEdge(point3, point2));
-            } else if (point3.equals(steinerPoint)) {
-                result.addEdge(new EuclideanEdge(point1, point3));
-                result.addEdge(new EuclideanEdge(point2, point3));
-            } else {
-                result.addEdge(new EuclideanEdge(point1, steinerPoint));
-                result.addEdge(new EuclideanEdge(point2, steinerPoint));
-                result.addEdge(new EuclideanEdge(point3, steinerPoint));
-                result.addVertex(steinerPoint);
-            }
-            return result;
-        } catch (IllegalComponentException e) {
-            e.printStackTrace();
-            return null;
+        if (point1.equals(steinerPoint)) {
+            graph.addEdge(new EuclideanEdge(point2, point1));
+            graph.addEdge(new EuclideanEdge(point3, point1));
+        } else if (point2.equals(steinerPoint)) {
+            graph.addEdge(new EuclideanEdge(point1, point2));
+            graph.addEdge(new EuclideanEdge(point3, point2));
+        } else if (point3.equals(steinerPoint)) {
+            graph.addEdge(new EuclideanEdge(point1, point3));
+            graph.addEdge(new EuclideanEdge(point2, point3));
+        } else {
+            graph.addVertex(steinerPoint);
+            graph.addEdge(new EuclideanEdge(point1, steinerPoint));
+            graph.addEdge(new EuclideanEdge(point2, steinerPoint));
+            graph.addEdge(new EuclideanEdge(point3, steinerPoint));
         }
     }
 
@@ -171,14 +139,10 @@ public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph, Resu
                 extraPoint2.getKey(), extraPoint2.getValue(),
                 point1.getLocation().getXProperty().get(), point1.getLocation().getYProperty().get()
         );
-        try {
-            EuclideanTerminal steinerPoint = new EuclideanTerminal(new EuclideanLocation(intersection.getKey(), intersection.getValue()));
-            steinerPoint.type = STBTerminalType.STEINER_TERMINAL;
-            return steinerPoint;
-        } catch (IllegalLocationException | NullPointerException e) {
-            e.printStackTrace();
-            return null;
-        }
+        // TODO: get id
+        EuclideanTerminal steinerPoint = new EuclideanTerminal(new EuclideanLocation(intersection.getKey(), intersection.getValue()), IdUtils.getTerminalId());
+        steinerPoint.type = STBTerminalType.STEINER_TERMINAL;
+        return steinerPoint;
     }
 
     private static Pair<Double, Double> getIntersection(double x11, double y11, double x12, double y12, double x21, double y21, double x22, double y22) {
