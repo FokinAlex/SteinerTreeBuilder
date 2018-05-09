@@ -109,11 +109,7 @@ public class PageEdge extends Group {
 
     @Deprecated // bad practice
     public STBEdge genEdge(STBTerminal firstEndpoint, STBTerminal secondEndpoint) {
-        try {
-            this.setEdge(new EuclideanEdge((EuclideanTerminal) firstEndpoint, (EuclideanTerminal) secondEndpoint));
-        } catch (IllegalComponentException e) {
-            // Never be here
-        }
+        this.setEdge(new EuclideanEdge((EuclideanTerminal) firstEndpoint, (EuclideanTerminal) secondEndpoint));
         return edge;
     }
 

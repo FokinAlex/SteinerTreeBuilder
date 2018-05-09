@@ -1,12 +1,12 @@
 package core.implementations.euclidean;
 
-import core.exceptions.IllegalLocationException;
+import com.sun.istack.internal.NotNull;
 import core.implementations.abstractions.AbstractTerminal;
 
 public class EuclideanTerminal<Location extends EuclideanLocation> extends AbstractTerminal<Location> {
 
-    public EuclideanTerminal(Location location) throws IllegalLocationException {
-        this.setLocation(location);
+    public EuclideanTerminal(@NotNull Location location, long id) {
+        super(location, id);
     }
 
     @Override
@@ -15,7 +15,7 @@ public class EuclideanTerminal<Location extends EuclideanLocation> extends Abstr
     }
 
     @Override
-    public void setLocation(Location location) throws IllegalLocationException {
-        super.setLocation(location);
+    public EuclideanTerminal clone() throws CloneNotSupportedException {
+        return new EuclideanTerminal(this.location.clone(), this.id);
     }
 }

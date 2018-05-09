@@ -1,10 +1,11 @@
 package core.implementations.abstractions;
 
-import core.exceptions.IllegalComponentException;
+import com.sun.istack.internal.NotNull;
 import core.interfaces.STBEdge;
 import core.interfaces.STBTerminal;
 import core.types.STBEdgeType;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 public abstract class AbstractEdge<Terminal extends STBTerminal> implements STBEdge<Terminal> {
 
@@ -14,21 +15,15 @@ public abstract class AbstractEdge<Terminal extends STBTerminal> implements STBE
 
     protected DoubleProperty lengthProperty;
 
-    @Override
-    public void setFirstEndpoint(Terminal terminal) throws IllegalComponentException {
-        if(terminal == null) throw new IllegalComponentException("Endpoint can not be null", this);
-        this.firstEndpoint = terminal;
+    public AbstractEdge(@NotNull Terminal firstEndpoint, @NotNull Terminal secondEndpoint) {
+        this.firstEndpoint = firstEndpoint;
+        this.secondEndpoint = secondEndpoint;
+        this.lengthProperty = new SimpleDoubleProperty();
     }
 
     @Override
     public Terminal getFirstEndpoint() {
         return this.firstEndpoint;
-    }
-
-    @Override
-    public void setSecondEndpoint(Terminal terminal) throws IllegalComponentException {
-        if(terminal == null) throw new IllegalComponentException("Endpoint can not be null", this);
-        this.secondEndpoint = terminal;
     }
 
     @Override
@@ -40,4 +35,7 @@ public abstract class AbstractEdge<Terminal extends STBTerminal> implements STBE
     public DoubleProperty getLengthProperty() {
         return this.lengthProperty;
     }
+
+    @Override
+    protected abstract STBEdge clone() throws CloneNotSupportedException;
 }

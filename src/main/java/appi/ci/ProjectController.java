@@ -74,7 +74,7 @@ public enum ProjectController {
             } catch (ParseException e) {
                 // TODO: show some information to user
                 e.printStackTrace();
-            } catch (IllegalComponentException | IllegalLocationException e) {
+            } catch (IllegalComponentException e) {
                 // TODO: show some information to user
                 e.printStackTrace();
             }

@@ -4,7 +4,7 @@ import core.interfaces.STBLocation;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
-public class AbstractLocation implements STBLocation {
+public abstract class AbstractLocation implements STBLocation {
 
     protected DoubleProperty xProperty;
     protected DoubleProperty yProperty;
@@ -23,4 +23,7 @@ public class AbstractLocation implements STBLocation {
     public DoubleProperty getYProperty() {
         return this.yProperty;
     }
+
+    @Override
+    protected abstract STBLocation clone() throws CloneNotSupportedException;
 }

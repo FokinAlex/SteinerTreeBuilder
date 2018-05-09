@@ -1,8 +1,8 @@
 package gui;
 
-import core.exceptions.IllegalLocationException;
 import core.implementations.euclidean.EuclideanLocation;
 import core.implementations.euclidean.EuclideanTerminal;
+import core.interfaces.STBGraph;
 import core.interfaces.STBTerminal;
 import core.types.STBTerminalType;
 import javafx.beans.property.BooleanProperty;
@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import utils.IdUtils;
 
 public class PagePoint extends StackPane {
 
@@ -94,13 +95,11 @@ public class PagePoint extends StackPane {
 //        });
     }
 
+
     @Deprecated // Bad practice
-    public STBTerminal genTerminal(double x, double y) {
-        try {
-            this.setTerminal(new EuclideanTerminal(new EuclideanLocation(x, y)));
-        } catch (IllegalLocationException e) {
-            // Never be here
-        }
+    public STBTerminal genTerminal(double x, double y, STBGraph graph) {
+        // TODO: get id
+        this.setTerminal(new EuclideanTerminal(new EuclideanLocation(x, y), IdUtils.getTerminalId(graph)));
         return this.terminal;
     }
 
