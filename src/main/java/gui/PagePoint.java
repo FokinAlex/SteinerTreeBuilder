@@ -1,48 +1,35 @@
 package gui;
 
-import core.implementations.euclidean.EuclideanLocation;
-import core.implementations.euclidean.EuclideanTerminal;
-import core.interfaces.STBGraph;
-import core.interfaces.STBTerminal;
-import core.types.STBTerminalType;
+import appi.ci.interfaces.ProjectPointView;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import utils.IdUtils;
 
-public class PagePoint extends StackPane {
+public class PagePoint extends StackPane implements ProjectPointView {
 
+    // TODO: replace next 3 lines into configuration
     public static final double REGULAR_POINT_RADIUS = 10.;
     public static final double HALO_BORDER_OFFSET = 4.;
     public static final double HALO_SIZE = REGULAR_POINT_RADIUS * 2 + HALO_BORDER_OFFSET * 2;
+
+    private Circle background;
+    private Rectangle halo;
 
     private BooleanProperty isSelected = new SimpleBooleanProperty(false);
     private BooleanProperty isFirstEndpoint = new SimpleBooleanProperty(false);
     private BooleanProperty isSecondEndpoint = new SimpleBooleanProperty(false);
 
-    @Deprecated // Bad practice
-    private STBTerminal terminal;
-
-    private Circle background;
-    private Rectangle halo;
-
     PagePoint(double x, double y) {
         this.layoutXProperty().set(x);
         this.layoutYProperty().set(y);
 
-        this.setOnMouseClicked(event -> {
-            if (((PagePane) this.getParent()).edgeAdditionModeProperty().get() &&
-                    ((PagePane) this.getParent()).selectedTerminalProperty().get() &&
-                    (!this.equals(((PagePane) this.getParent()).getSelectedPoint()))) {
-                ((PagePane) this.getParent()).addEdge(((PagePane) this.getParent()).getSelectedPoint(), this);
-            }
-            ((PagePane) this.getParent()).selectPoint(this.isSelected.get() ? null : this);
-        });
-
         this.backgroundInit();
         this.haloInit();
+
+        this.setOnMouseClicked(event -> this.isSelected.set(!this.isSelected.get()));
 
         this.getChildren().addAll(this.halo, this.background);
     }
@@ -50,74 +37,65 @@ public class PagePoint extends StackPane {
     private void backgroundInit() {
         this.background = new Circle(REGULAR_POINT_RADIUS);
         this.background.getStyleClass().add(StylesheetsConstants.TERMINAL_BACKGROUND);
-        this.isSelected.addListener((observable, oldValue, newValue) -> this.background.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_SELECTED, newValue));
+        this.isSelected.addListener((observable, oldValue, newValue) -> {
+            this.halo.visibleProperty().set(newValue);
+            this.background.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_SELECTED, newValue);
+        });
     }
 
     private void haloInit() {
         this.halo = new Rectangle(HALO_SIZE, HALO_SIZE);
-        this.halo.visibleProperty().bind(this.isSelected);
         this.halo.getStyleClass().add(StylesheetsConstants.HALO);
-        this.isFirstEndpoint.addListener((observable, oldValue, newValue) -> this.halo.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_FIRSTENDPOINT, newValue));
-        this.isSecondEndpoint.addListener((observable, oldValue, newValue) -> this.halo.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_SECONDENDPOINT, newValue));
+        this.halo.visibleProperty().set(false);
+        this.isFirstEndpoint.addListener((observable, oldValue, newValue) -> {
+            this.halo.visibleProperty().set(newValue);
+            this.halo.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_FIRSTENDPOINT, newValue);
+        });
+        this.isSecondEndpoint.addListener((observable, oldValue, newValue) -> {
+            this.halo.visibleProperty().set(newValue);
+            this.halo.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_SECONDENDPOINT, newValue);
+        });
     }
 
-    public void delete() {
-        this.terminal.getLocation().getXProperty().unbind();
-        this.terminal.getLocation().getYProperty().unbind();
-        this.terminal = null;
-        this.unselect();
+    @Override
+    public BooleanProperty isFirstEndpoint() {
+        return this.isFirstEndpoint;
     }
 
-    @Deprecated // Bad practice
-    public STBTerminal getTerminal() {
-        return terminal;
+    @Override
+    public BooleanProperty isSecondEndpoint() {
+        return this.isSecondEndpoint;
     }
 
-    @Deprecated // Bad practice
-    public void setTerminal(STBTerminal terminal) {
-        this.terminal = terminal;
-        if (((EuclideanTerminal) this.terminal).type == STBTerminalType.STEINER_TERMINAL) this.background.setRadius(6);
-        this.terminal.getLocation().getXProperty().bind(this.layoutXProperty());
-        this.terminal.getLocation().getYProperty().bind(this.layoutYProperty());
-//      TODO: if something must change in real time
-//        ((PagePane) this.getParent()).algorithmInProgressProperty().addListener((observable, oldValue, newValue) -> {
-//            if (newValue) {
-//                this.terminal.getLocation().getXProperty().unbind();
-//                this.terminal.getLocation().getYProperty().unbind();
-//                this.layoutXProperty().bind(this.terminal.getLocation().getXProperty());
-//                this.layoutYProperty().bind(this.terminal.getLocation().getYProperty());
-//            } else {
-//                this.layoutXProperty().unbind();
-//                this.layoutYProperty().unbind();
-//                this.terminal.getLocation().getXProperty().bind(this.layoutXProperty());
-//                this.terminal.getLocation().getYProperty().bind(this.layoutYProperty());
-//            }
-//        });
+    @Override
+    public BooleanProperty isSelectedProperty() {
+        return this.isSelected;
     }
 
-
-    @Deprecated // Bad practice
-    public STBTerminal genTerminal(double x, double y, STBGraph graph) {
-        // TODO: get id
-        this.setTerminal(new EuclideanTerminal(new EuclideanLocation(x, y), IdUtils.getTerminalId(graph)));
-        return this.terminal;
+    @Override
+    public DoubleProperty xPropertyProperty() {
+        return this.layoutXProperty();
     }
 
+    @Override
+    public DoubleProperty yPropertyProperty() {
+        return this.layoutYProperty();
+    }
+
+    @Override
     public void select() {
         this.isSelected.set(true);
     }
 
+    @Override
     public void unselect() {
         this.isSelected.set(false);
         this.isFirstEndpoint.set(false);
         this.isSecondEndpoint.set(false);
     }
 
-    public void setIsFirstEndpoint(boolean isFirstEndpoint) {
-        this.isFirstEndpoint.set(isFirstEndpoint);
-    }
-
-    public void setIsSecondEndpoint(boolean isSecondEndpoint) {
-        this.isSecondEndpoint.set(isSecondEndpoint);
+    @Override
+    public void delete() {
+        this.unselect();
     }
 }

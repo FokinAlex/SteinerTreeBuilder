@@ -1,5 +1,6 @@
 package gui;
 
+import appi.ci.GraphPagePaneController;
 import appi.ci.ProjectController;
 import appi.ci.SteinerExactAlgorithms;
 import appi.ci.SteinerHeuristicAlgorithms;
@@ -63,6 +64,8 @@ public class MainWindowController {
     @FXML private Label leftStatus;
     @FXML private Label rightStatus;
 
+    private GraphPagePaneController graphPageController;
+
     // Actions:
     @FXML
     public void initialize() {
@@ -70,12 +73,12 @@ public class MainWindowController {
         this.edgePropertiesPane.visibleProperty().set(false);
         SteinerExactAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
-            menuItem.setOnAction(event -> ((PagePane) this.projectViewPane.getContent()).execute(type));
+            menuItem.setOnAction(event -> this.graphPageController.execute(type));
             this.steinerExactAlgorithms.getItems().add(menuItem);
         });
         SteinerHeuristicAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
-            menuItem.setOnAction(event -> ((PagePane) this.projectViewPane.getContent()).execute(type));
+            menuItem.setOnAction(event -> this.graphPageController.execute(type));
             this.steinerHeuristicAlgorithms.getItems().add(menuItem);
         });
     }
@@ -160,7 +163,7 @@ public class MainWindowController {
         // TODO: block button if no project
         Pair<Double, Double> result = DialogUtils.showNewEuclideanTerminalDialog();
         if (result != null) {
-            ((PagePane) projectViewPane.getContent()).addTerminal(result.getKey(), result.getValue());
+            this.graphPageController.addPoint(result.getKey(), result.getValue());
             return true;
         }
         return false;
@@ -169,52 +172,50 @@ public class MainWindowController {
     @FXML
     public boolean addEdgeAction() {
         setLeftStatus("Add edge action");
-        ((PagePane) projectViewPane.getContent()).edgeAdditionMode(this.addEdgeRMI.isSelected());
+        this.graphPageController.edgeAdditionMode(this.addEdgeRMI.isSelected());
         return true;
     }
 
     @FXML
     private boolean deleteTerminalAction() {
         setLeftStatus("Delete terminal action");
-        ((PagePane) projectViewPane.getContent()).deleteSelectedTerminal();
+        this.graphPageController.deleteSelectedPoint();
         return true;
     }
 
     @FXML
     private boolean deleteEdgeAction() {
         setLeftStatus("Delete edge action");
-        ((PagePane) projectViewPane.getContent()).deleteSelectedEdge();
+        this.graphPageController.deleteSelectedEdge();
         return true;
     }
 
     private void setBindings() {
         terminalPropertiesPane.visibleProperty()
-                .bind(((PagePane) projectViewPane.getContent()).selectedTerminalProperty());
+                .bind(graphPageController.selectedTerminalProperty());
         edgePropertiesPane.visibleProperty()
-                .bind(((PagePane) projectViewPane.getContent()).selectedEdgeProperty());
-        ((PagePane) projectViewPane.getContent()).setSelectedTerminalXProperty(terminalXValue.textProperty());
-        ((PagePane) projectViewPane.getContent()).setSelectedTerminalYProperty(terminalYValue.textProperty());
-        ((PagePane) projectViewPane.getContent()).setFirstTerminalXProperty(edgeFirstEndpointXValue.textProperty());
-        ((PagePane) projectViewPane.getContent()).setFirstTerminalYProperty(edgeFirstEndpointYValue.textProperty());
-        ((PagePane) projectViewPane.getContent()).setSecondTerminalXProperty(edgeSecondEndpointXValue.textProperty());
-        ((PagePane) projectViewPane.getContent()).setSecondTerminalYProperty(edgeSecondEndpointYValue.textProperty());
-        ((PagePane) projectViewPane.getContent()).setEdgeLengthProperty(edgeLenghtValue.textProperty());
+                .bind(graphPageController.selectedEdgeProperty());
+        graphPageController.setSelectedPointXPropertyFollower(terminalXValue.textProperty());
+        graphPageController.setSelectedPointYPropertyFollower(terminalYValue.textProperty());
+        graphPageController.setFirstPointXPropertyFollower(edgeFirstEndpointXValue.textProperty());
+        graphPageController.setFirstPointYPropertyFollower(edgeFirstEndpointYValue.textProperty());
+        graphPageController.setSecondPointXPropertyFollower(edgeSecondEndpointXValue.textProperty());
+        graphPageController.setSecondPointYPropertyFollower(edgeSecondEndpointYValue.textProperty());
+        graphPageController.setEdgeLengthPropertyFollower(edgeLenghtValue.textProperty());
     }
 
 
     private boolean uploadProjectWorkspace(Project project) {
         if (project != null) {
-            clearProjectViewPane();
-            this.projectViewPane.setContent(new PagePane((GraphPage) project.getCurrentPage()));
+            this.projectViewPane.setContent(null);
+            PagePane pagePane = new PagePane();
+            this.graphPageController = new GraphPagePaneController(pagePane, (GraphPage) project.getCurrentPage());
+            this.projectViewPane.setContent(pagePane);
             this.algorithmsMenu.setDisable(false);
             this.projectMenu.setDisable(false);
             return true;
         }
         return false;
-    }
-
-    private void clearProjectViewPane() {
-        this.projectViewPane.setContent(null);
     }
 
     private void setLeftStatus(String leftStatus) {
