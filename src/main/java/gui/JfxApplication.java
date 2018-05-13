@@ -32,9 +32,7 @@ public class JfxApplication extends Application {
         stage.show();
     }
 
-    //* TODO: add this to STBMain.java:
     public static void main(String[] args) {
         JfxApplication.launch(args);
     }
-    // */
 }

@@ -1,12 +1,11 @@
 package core.implementations.euclidean;
 
-import com.sun.istack.internal.NotNull;
 import core.implementations.abstractions.AbstractEdge;
 import javafx.beans.property.DoubleProperty;
 
 public class EuclideanEdge<Terminal extends EuclideanTerminal> extends AbstractEdge<Terminal> {
 
-    public EuclideanEdge(@NotNull Terminal firstEndpoint, @NotNull Terminal secondEndpoint) {
+    public EuclideanEdge(Terminal firstEndpoint, Terminal secondEndpoint) {
         super(firstEndpoint, secondEndpoint);
         this.lengthProperty = (EuclideanMetric.METRIC.apply(this.firstEndpoint.getLocation(), this.secondEndpoint.getLocation()));
     }

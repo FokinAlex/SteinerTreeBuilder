@@ -1,6 +1,5 @@
 package core.implementations.abstractions;
 
-import com.sun.istack.internal.NotNull;
 import core.interfaces.STBEdge;
 import core.interfaces.STBTerminal;
 import core.types.STBEdgeType;
@@ -15,7 +14,7 @@ public abstract class AbstractEdge<Terminal extends STBTerminal> implements STBE
 
     protected DoubleProperty lengthProperty;
 
-    public AbstractEdge(@NotNull Terminal firstEndpoint, @NotNull Terminal secondEndpoint) {
+    public AbstractEdge(Terminal firstEndpoint, Terminal secondEndpoint) {
         this.firstEndpoint = firstEndpoint;
         this.secondEndpoint = secondEndpoint;
         this.lengthProperty = new SimpleDoubleProperty();
