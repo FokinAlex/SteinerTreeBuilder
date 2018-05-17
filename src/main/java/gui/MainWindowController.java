@@ -2,7 +2,6 @@ package gui;
 
 import appi.ci.*;
 import appi.ci.interfaces.Project;
-import core.implementations.GraphPage;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -38,6 +37,7 @@ public class MainWindowController {
     // "Page" menu:
     @FXML private Menu pageMenu;
     @FXML private MenuItem addTerminalMI;
+    @FXML private RadioMenuItem addTerminalsRMI;
     @FXML private MenuItem addEdgeMI;
     @FXML private RadioMenuItem addEdgesRMI;
     @FXML private MenuItem renamePageMI;
@@ -94,7 +94,7 @@ public class MainWindowController {
     @FXML
     public boolean newProjectAction() {
         setLeftStatus("New project action");
-        // TODO: user must chooser project type
+        // TODO: user must choose project type
         uploadProjectWorkspace(ProjectController.getNewProject(ProjectController.SIMPLE_PROJECT));
         setBindings();
         return true;
@@ -183,8 +183,7 @@ public class MainWindowController {
 
     @FXML
     public boolean addTerminalAction() {
-        setLeftStatus("Add node action");
-        // TODO: block button if no project
+        setLeftStatus("Add terminal action");
         Pair<Double, Double> result = DialogUtils.showNewEuclideanTerminalDialog();
         if (result != null) {
             this.pagesController.getCurrentPageController().addPoint(result.getKey(), result.getValue());
@@ -194,9 +193,19 @@ public class MainWindowController {
     }
 
     @FXML
+    public boolean addTerminalsAction() {
+        setLeftStatus("Add terminals action");
+        this.pagesController.setTerminalAdditionModeProperty(this.addTerminalsRMI.isSelected());
+        this.pagesController.setSingleEdgeAdditionModeProperty(false);
+        this.addEdgesRMI.setSelected(false);
+        return false;
+    }
+
+    @FXML
     public boolean addEdgeAction() {
         setLeftStatus("Add edge action");
         this.pagesController.setSingleEdgeAdditionModeProperty(true);
+        this.addTerminalsRMI.setSelected(false);
         this.addEdgesRMI.setSelected(false);
         return true;
     }
@@ -205,6 +214,7 @@ public class MainWindowController {
     public boolean addEdgesAction() {
         setLeftStatus("Add edges action");
         this.pagesController.setEdgeAdditionModeProperty(this.addEdgesRMI.isSelected());
+        this.addTerminalsRMI.setSelected(false);
         return true;
     }
 
