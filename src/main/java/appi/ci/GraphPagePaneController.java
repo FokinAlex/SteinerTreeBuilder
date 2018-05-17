@@ -35,6 +35,7 @@ public class GraphPagePaneController {
 
     private BooleanProperty hasSelectedPoint = new SimpleBooleanProperty(false);
     private BooleanProperty hasSelectedEdge = new SimpleBooleanProperty(false);
+    private BooleanProperty terminalAdditionMode = new SimpleBooleanProperty(false);
     private BooleanProperty edgeAdditionMode = new SimpleBooleanProperty(false);
     private BooleanProperty singleEdgeAdditionMode = new SimpleBooleanProperty(false);
     private BooleanProperty algorithmInProgress = new SimpleBooleanProperty(false);
@@ -83,29 +84,30 @@ public class GraphPagePaneController {
                     resultController.addEdge((STBEdge) edge);
                     resultController.page.getGraph().addEdge((STBEdge) edge);
                 });
-                // TODO: algorithm.getResult() -> report
                 // TODO: unblock something < - - - +
             }
         });
         // TODO: block something - - - - - - - - - +
+        // TODO: run algorithms in different threads -> new Thread(algorithm).start();
         algorithm.run();
-//        TODO: run algorithms in different threads
-//        Thread thread = new Thread(algorithm);
-//        thread.start();
     }
 
     public ProjectPointView addPoint(STBTerminal terminal) {
         // TODO: check type
         ProjectPointView pointView = this.pageView.addNewPoint(terminal.getLocation().getXProperty().get(), terminal.getLocation().getYProperty().get());
         pointView.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
-            if ((this.edgeAdditionMode.get() || this.singleEdgeAdditionMode.get()) && this.hasSelectedPoint.get() && newValue)  {
-                if (!pointView.equals(this.selectedPoint)) {
-                    this.addEdge(this.selectedPoint, pointView);
+            if (!terminalAdditionMode.get()) {
+                if ((this.edgeAdditionMode.get() || this.singleEdgeAdditionMode.get()) && this.hasSelectedPoint.get() && newValue)  {
+                    if (!pointView.equals(this.selectedPoint)) {
+                        this.addEdge(this.selectedPoint, pointView);
+                    }
+                    this.singleEdgeAdditionMode.set(false);
                 }
-                this.singleEdgeAdditionMode.set(false);
+                if (newValue) this.select(pointView);
+                else this.unselect(pointView);
+            } else {
+                pointView.unselect();
             }
-            if (newValue) this.select(pointView);
-            else this.unselect(pointView);
         });
         terminal.getLocation().getXProperty().bind(pointView.xPropertyProperty());
         terminal.getLocation().getYProperty().bind(pointView.yPropertyProperty());
@@ -164,8 +166,12 @@ public class GraphPagePaneController {
             if (firstTerminal.equals(edge.getFirstEndpoint()) && secondTerminal.equals(edge.getSecondEndpoint())) {
                 edgeView[0] = this.pageView.addNewEdge(firstPoint, secondPoint);
                 edgeView[0].isSelectedProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue) this.select(edgeView[0]);
-                    else this.unselect(edgeView[0]);
+                    if (!terminalAdditionMode.get()) {
+                        if (newValue) this.select(edgeView[0]);
+                        else this.unselect(edgeView[0]);
+                    } else {
+                        edgeView[0].unselect();
+                    }
                 });
                 this.edges.put(edgeView[0], edge);
             }
@@ -301,7 +307,11 @@ public class GraphPagePaneController {
         return this.edgeLengthDoubleProperty;
     }
 
-    public void setSingleEdgeAdditionModeProperty(BooleanProperty property) {
+    public void setTerminalAdditionModePropertyFollower(BooleanProperty property) {
+        this.terminalAdditionMode = property;
+    }
+
+    public void setSingleEdgeAdditionModePropertyFollower(BooleanProperty property) {
         this.singleEdgeAdditionMode = property;
     }
 

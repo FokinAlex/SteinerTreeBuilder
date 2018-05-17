@@ -6,6 +6,7 @@ import core.exceptions.IllegalComponentException;
 import core.implementations.GraphPage;
 import core.implementations.euclidean.EuclideanGraph;
 import gui.PagePane;
+import gui.PagePoint;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.ScrollPane;
@@ -26,6 +27,7 @@ public class ProjectPagesController extends TabPane {
 
     private BooleanProperty selectedPointProperty = new SimpleBooleanProperty();
     private BooleanProperty selectedEdgeProperty = new SimpleBooleanProperty();
+    private BooleanProperty terminalAddtionModeProperty = new SimpleBooleanProperty();
     private BooleanProperty edgeAdditionModeProperty = new SimpleBooleanProperty();
     private BooleanProperty singleEdgeAdditionModeProperty = new SimpleBooleanProperty();
     private BooleanProperty hasntCurrentPage;
@@ -105,7 +107,8 @@ public class ProjectPagesController extends TabPane {
     private Tab addNewGraphPage(GraphPage page) {
         PagePane pageView = new PagePane();
         GraphPagePaneController pageController = new GraphPagePaneController(pageView, page);
-        pageController.setSingleEdgeAdditionModeProperty(this.singleEdgeAdditionModeProperty);
+        pageController.setTerminalAdditionModePropertyFollower(this.terminalAddtionModeProperty);
+        pageController.setSingleEdgeAdditionModePropertyFollower(this.singleEdgeAdditionModeProperty);
         pageController.setSelectedPointXPropertyFollower(this.selectedPointXProperty);
         pageController.setSelectedPointYPropertyFollower(this.selectedPointYProperty);
         pageController.setFirstPointXPropertyFollower(this.firstPointXProperty);
@@ -114,6 +117,13 @@ public class ProjectPagesController extends TabPane {
         pageController.setSecondPointYPropertyFollower(this.secondPointYProperty);
         Tab tab = new Tab(page.getName());
         ScrollPane wrap = new ScrollPane();
+        wrap.setOnMouseClicked(event -> {
+            if (this.terminalAddtionModeProperty.get())
+                pageController.addPoint(
+                        event.getX() - PagePoint.HALO_SIZE / 2,
+                        event.getY() - PagePoint.HALO_SIZE / 2
+                );
+        });
         wrap.setContent(pageView);
         tab.setContent(wrap);
         tabs.put(tab, pageController);
@@ -148,13 +158,27 @@ public class ProjectPagesController extends TabPane {
         return selectedEdgeProperty;
     }
 
+    public void setTerminalAdditionModeProperty(boolean value) {
+        if (value) {
+            this.setSingleEdgeAdditionModeProperty(false);
+            this.setEdgeAdditionModeProperty(false);
+        }
+        this.terminalAddtionModeProperty.set(value);
+    }
+
     public void setEdgeAdditionModeProperty(boolean value) {
-        if (value) this.setSingleEdgeAdditionModeProperty(false);
+        if (value) {
+            this.setTerminalAdditionModeProperty(false);
+            this.setSingleEdgeAdditionModeProperty(false);
+        }
         this.edgeAdditionModeProperty.set(value);
     }
 
     public void setSingleEdgeAdditionModeProperty(boolean value) {
-        if (value) this.setEdgeAdditionModeProperty(false);
+        if (value) {
+            this.setTerminalAdditionModeProperty(false);
+            this.setEdgeAdditionModeProperty(false);
+        }
         this.singleEdgeAdditionModeProperty.set(value);
     }
 

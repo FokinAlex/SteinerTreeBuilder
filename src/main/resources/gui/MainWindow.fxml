@@ -52,6 +52,7 @@
         <Menu fx:id="pageMenu" disable="true" mnemonicParsing="false" text="Page">
           <items>
             <MenuItem fx:id="addTerminalMI" mnemonicParsing="false" onAction="#addTerminalAction" text="Add Terminal" />
+                  <RadioMenuItem fx:id="addTerminalsRMI" mnemonicParsing="false" onAction="#addTerminalsAction" text="Add Terminals" />
                   <MenuItem fx:id="addEdgeMI" mnemonicParsing="false" onAction="#addEdgeAction" text="Add Edge" />
                   <RadioMenuItem fx:id="addEdgesRMI" mnemonicParsing="false" onAction="#addEdgesAction" text="Add Edges" />
                   <SeparatorMenuItem mnemonicParsing="false" />
