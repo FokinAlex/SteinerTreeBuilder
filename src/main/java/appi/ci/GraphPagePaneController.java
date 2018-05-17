@@ -6,6 +6,7 @@ import appi.ci.interfaces.ProjectPageView;
 import appi.ci.interfaces.ProjectPointView;
 import core.implementations.GraphPage;
 import core.implementations.euclidean.EuclideanEdge;
+import core.implementations.euclidean.EuclideanGraph;
 import core.implementations.euclidean.EuclideanLocation;
 import core.implementations.euclidean.EuclideanTerminal;
 import core.interfaces.STBAlgorithm;
@@ -32,9 +33,10 @@ public class GraphPagePaneController {
     private ProjectPageView pageView;
     private GraphPage page;
 
-    private BooleanProperty edgeAdditionMode = new SimpleBooleanProperty(false);
-    private BooleanProperty hasSelectedEdge = new SimpleBooleanProperty(false);
     private BooleanProperty hasSelectedPoint = new SimpleBooleanProperty(false);
+    private BooleanProperty hasSelectedEdge = new SimpleBooleanProperty(false);
+    private BooleanProperty edgeAdditionMode = new SimpleBooleanProperty(false);
+    private BooleanProperty singleEdgeAdditionMode = new SimpleBooleanProperty(false);
     private BooleanProperty algorithmInProgress = new SimpleBooleanProperty(false);
 
     private StringProperty selectedPointXProperty;
@@ -44,7 +46,6 @@ public class GraphPagePaneController {
     private StringProperty secondPointXProperty;
     private StringProperty secondPointYProperty;
 
-    private StringProperty edgeLengthStringProperty = new SimpleStringProperty();
     private DoubleProperty edgeLengthDoubleProperty = new SimpleDoubleProperty();
 
     private ChangeListener<String> selectedTerminalXValueListener;
@@ -61,34 +62,48 @@ public class GraphPagePaneController {
         this.points = new HashMap<>();
         this.edges = new HashMap<>();
         this.graphInit();
-        // TODO: replace to gui
-        this.edgeLengthDoubleProperty.addListener((observable, oldValue, newValue) -> edgeLengthStringProperty.set("Length: " + ((Math.round((Double) newValue * 1000) / 1000.))));
     }
 
-    public void execute(AlgorithmType type) {
+    public GraphPage getPage() {
+        return this.page;
+    }
+
+    public void execute(AlgorithmType type, GraphPagePaneController resultController) {
         STBAlgorithm algorithm = type.getInstance(this.page.getGraph());
         this.algorithmInProgress.bind(algorithm.inProgressProperty());
         this.algorithmInProgress.addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 this.algorithmInProgress.unbind();
+                EuclideanGraph result = (EuclideanGraph) algorithm.getResult();
+                result.getAllVertexes().forEach(vertex -> {
+                    resultController.addPoint((STBTerminal) vertex);
+                    resultController.page.getGraph().addVertex((STBTerminal) vertex);
+                });
+                result.getAllEdges().forEach(edge -> {
+                    resultController.addEdge((STBEdge) edge);
+                    resultController.page.getGraph().addEdge((STBEdge) edge);
+                });
                 // TODO: algorithm.getResult() -> report
                 // TODO: unblock something < - - - +
             }
         });
-        Thread thread = new Thread(algorithm);
         // TODO: block something - - - - - - - - - +
-        thread.start();
-    }
-
-    public void edgeAdditionMode(boolean value) {
-        this.edgeAdditionMode.set(value);
+        algorithm.run();
+//        TODO: run algorithms in different threads
+//        Thread thread = new Thread(algorithm);
+//        thread.start();
     }
 
     public ProjectPointView addPoint(STBTerminal terminal) {
         // TODO: check type
         ProjectPointView pointView = this.pageView.addNewPoint(terminal.getLocation().getXProperty().get(), terminal.getLocation().getYProperty().get());
         pointView.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (this.edgeAdditionMode.get() && this.hasSelectedPoint.get() && newValue && !pointView.equals(this.selectedPoint)) this.addEdge(this.selectedPoint, pointView);
+            if ((this.edgeAdditionMode.get() || this.singleEdgeAdditionMode.get()) && this.hasSelectedPoint.get() && newValue)  {
+                if (!pointView.equals(this.selectedPoint)) {
+                    this.addEdge(this.selectedPoint, pointView);
+                }
+                this.singleEdgeAdditionMode.set(false);
+            }
             if (newValue) this.select(pointView);
             else this.unselect(pointView);
         });
@@ -223,8 +238,14 @@ public class GraphPagePaneController {
     }
 
     private void unselect(ProjectPointView point) {
-        if (selectedTerminalXValueListener != null) this.selectedPointXProperty.removeListener(this.selectedTerminalXValueListener);
-        if (selectedTerminalYValueListener != null) this.selectedPointYProperty.removeListener(this.selectedTerminalYValueListener);
+        if (selectedTerminalXValueListener != null) {
+            this.selectedPointXProperty.removeListener(this.selectedTerminalXValueListener);
+            this.selectedTerminalXValueListener = null;
+        }
+        if (selectedTerminalYValueListener != null) {
+            this.selectedPointYProperty.removeListener(this.selectedTerminalYValueListener);
+            this.selectedTerminalYValueListener = null;
+        }
         if (point.equals(selectedPoint)) {
             this.selectedPoint = null;
             this.hasSelectedEdge.set(false);
@@ -233,10 +254,23 @@ public class GraphPagePaneController {
     }
 
     private void unselect(ProjectEdgeView edge) {
-        if (firstTerminalXValueListener != null) this.firstPointXProperty.removeListener(this.firstTerminalXValueListener);
-        if (firstTerminalYValueListener != null) this.firstPointYProperty.removeListener(this.firstTerminalYValueListener);
-        if (secondTerminalXValueListener != null) this.secondPointXProperty.removeListener(this.secondTerminalXValueListener);
-        if (secondTerminalYValueListener != null) this.secondPointYProperty.removeListener(this.secondTerminalYValueListener);
+        if (firstTerminalXValueListener != null) {
+            this.firstPointXProperty.removeListener(this.firstTerminalXValueListener);
+            this.firstTerminalXValueListener = null;
+
+        }
+        if (firstTerminalYValueListener != null) {
+            this.firstPointYProperty.removeListener(this.firstTerminalYValueListener);
+            this.firstTerminalYValueListener = null;
+        }
+        if (secondTerminalXValueListener != null) {
+            this.secondPointXProperty.removeListener(this.secondTerminalXValueListener);
+            this.secondTerminalXValueListener = null;
+        }
+        if (secondTerminalYValueListener != null) {
+            this.secondPointYProperty.removeListener(this.secondTerminalYValueListener);
+            this.secondTerminalYValueListener = null;
+        }
         if (edge.equals(selectedEdge)) {
             this.selectedEdge.getFirstEndpoint().isFirstEndpoint().set(false);
             this.selectedEdge.getSecondEndpoint().isSecondEndpoint().set(false);
@@ -247,20 +281,28 @@ public class GraphPagePaneController {
         }
     }
 
-    public BooleanProperty selectedTerminalProperty() {
+    BooleanProperty selectedTerminalProperty() {
         return this.hasSelectedPoint;
     }
 
-    public BooleanProperty selectedEdgeProperty() {
+    BooleanProperty selectedEdgeProperty() {
         return this.hasSelectedEdge;
     }
 
-    public BooleanProperty edgeAdditionModeProperty() {
+    BooleanProperty edgeAdditionModeProperty() {
         return this.edgeAdditionMode;
     }
 
     public BooleanProperty algorithmInProgressProperty() {
         return this.algorithmInProgress;
+    }
+
+    public DoubleProperty edgeLengthProperty() {
+        return this.edgeLengthDoubleProperty;
+    }
+
+    public void setSingleEdgeAdditionModeProperty(BooleanProperty property) {
+        this.singleEdgeAdditionMode = property;
     }
 
     public void setSelectedPointXPropertyFollower(StringProperty property) {
@@ -287,7 +329,31 @@ public class GraphPagePaneController {
         this.secondPointYProperty = property;
     }
 
-    public void setEdgeLengthPropertyFollower(StringProperty property) {
-        this.edgeLengthStringProperty = property;
+    public void restoreProperties() {
+        if (selectedPoint != null) {
+            this.selectedPointXProperty.set(this.selectedPoint.xPropertyProperty().get() + "");
+            this.selectedPointYProperty.set(this.selectedPoint.yPropertyProperty().get() + "");
+            this.selectedPointXProperty.addListener(this.selectedTerminalXValueListener);
+            this.selectedPointYProperty.addListener(this.selectedTerminalYValueListener);
+        }
+        if (this.selectedEdge != null) {
+            this.firstPointXProperty.set(this.selectedEdge.getFirstEndpoint().xPropertyProperty().get() + "");
+            this.firstPointYProperty.set(this.selectedEdge.getFirstEndpoint().yPropertyProperty().get() + "");
+            this.secondPointXProperty.set(this.selectedEdge.getSecondEndpoint().xPropertyProperty().get() + "");
+            this.secondPointYProperty.set(this.selectedEdge.getSecondEndpoint().yPropertyProperty().get() + "");
+            this.firstPointXProperty.addListener(this.firstTerminalXValueListener);
+            this.firstPointYProperty.addListener(this.firstTerminalYValueListener);
+            this.secondPointXProperty.addListener(this.secondTerminalXValueListener);
+            this.secondPointYProperty.addListener(this.secondTerminalYValueListener);
+        }
+    }
+
+    public void clearProperties() {
+        if (selectedTerminalXValueListener != null) this.selectedPointXProperty.removeListener(this.selectedTerminalXValueListener);
+        if (selectedTerminalYValueListener != null) this.selectedPointYProperty.removeListener(this.selectedTerminalYValueListener);
+        if (firstTerminalXValueListener != null) this.firstPointXProperty.removeListener(this.firstTerminalXValueListener);
+        if (firstTerminalYValueListener != null) this.firstPointYProperty.removeListener(this.firstTerminalYValueListener);
+        if (secondTerminalXValueListener != null) this.secondPointXProperty.removeListener(this.secondTerminalXValueListener);
+        if (secondTerminalYValueListener != null) this.secondPointYProperty.removeListener(this.secondTerminalYValueListener);
     }
 }

@@ -139,7 +139,6 @@ public class IncrementalOptimizationAlgorithm<Graph extends EuclideanGraph, Resu
                 extraPoint2.getKey(), extraPoint2.getValue(),
                 point1.getLocation().getXProperty().get(), point1.getLocation().getYProperty().get()
         );
-        // TODO: get id
         EuclideanTerminal steinerPoint = new EuclideanTerminal(new EuclideanLocation(intersection.getKey(), intersection.getValue()), IdUtils.getTerminalId());
         steinerPoint.type = STBTerminalType.STEINER_TERMINAL;
         return steinerPoint;

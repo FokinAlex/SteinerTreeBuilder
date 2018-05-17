@@ -26,7 +26,7 @@
           <items>
             <MenuItem fx:id="newProjectMI" mnemonicParsing="false" onAction="#newProjectAction" text="New" />
             <MenuItem fx:id="openProjectMI" mnemonicParsing="false" onAction="#openProjectAction" text="Open" />
-            <MenuItem fx:id="closeProjectMI" disable="true" mnemonicParsing="false" onAction="#closeProjectAction" text="Close" />
+            <MenuItem fx:id="closeProjectMI" mnemonicParsing="false" onAction="#closeProjectAction" text="Close" />
             <MenuItem fx:id="saveProjectMI" mnemonicParsing="false" onAction="#saveProjectAction" text="Save" />
           </items>
         </Menu>
@@ -43,10 +43,21 @@
             <MenuItem fx:id="selectAllMI" mnemonicParsing="false" onAction="#selectAllAction" text="Select All" />
           </items>
         </Menu>
-        <Menu fx:id="projectMenu" disable="true" mnemonicParsing="false" text="Project">
+            <Menu fx:id="projectMenu" disable="true" mnemonicParsing="false" text="Project">
+              <items>
+                <MenuItem fx:id="addPageMI" mnemonicParsing="false" onAction="#addPageAction" text="Add new Page" />
+                  <MenuItem fx:id="projectPropertiesMI" disable="true" mnemonicParsing="false" onAction="#showProjectPropertiesPageAction" text="Properties" />
+              </items>
+            </Menu>
+        <Menu fx:id="pageMenu" disable="true" mnemonicParsing="false" text="Page">
           <items>
             <MenuItem fx:id="addTerminalMI" mnemonicParsing="false" onAction="#addTerminalAction" text="Add Terminal" />
-                  <RadioMenuItem fx:id="addEdgeRMI" mnemonicParsing="false" onAction="#addEdgeAction" text="Add Edge" />
+                  <MenuItem fx:id="addEdgeMI" mnemonicParsing="false" onAction="#addEdgeAction" text="Add Edge" />
+                  <RadioMenuItem fx:id="addEdgesRMI" mnemonicParsing="false" onAction="#addEdgesAction" text="Add Edges" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="renamePageMI" mnemonicParsing="false" onAction="#renamePageAction" text="Rename Page" />
+                  <MenuItem fx:id="closePageMI" mnemonicParsing="false" onAction="#closePageAction" text="Close Page" />
+                  <MenuItem fx:id="removePageMI" mnemonicParsing="false" onAction="#removePageAction" text="Remove Page" />
           </items>
         </Menu>
             <Menu fx:id="algorithmsMenu" disable="true" mnemonicParsing="false" text="Algorithms">
@@ -63,7 +74,7 @@
     </MenuBar>
     <SplitPane dividerPositions="0.5" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
-            <ScrollPane fx:id="projectViewPane" prefHeight="200.0" prefWidth="200.0" />
+            <AnchorPane fx:id="projectViewPane" prefHeight="200.0" prefWidth="200.0" />
         <AnchorPane fx:id="projectPropertiesPane" maxWidth="220.0" minWidth="220.0" prefWidth="220.0">
                <children>
                   <Label layoutX="78.0" layoutY="17.0" text="Properties" AnchorPane.leftAnchor="76.0" AnchorPane.rightAnchor="76.0" AnchorPane.topAnchor="10.0" />

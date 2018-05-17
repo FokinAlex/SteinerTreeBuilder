@@ -3,13 +3,17 @@ package appi.ci;
 import appi.ci.implementations.SimpleProject;
 import appi.ci.interfaces.Project;
 import core.exceptions.IllegalComponentException;
-import core.exceptions.IllegalLocationException;
+import core.implementations.GraphMultiPageScheme;
 import core.implementations.GraphPage;
-import core.implementations.GraphSinglePageScheme;
 import core.implementations.euclidean.EuclideanGraph;
-import core.interfaces.STBGraph;
-import dai.PageDataAccess;
+import core.interfaces.STBPage;
+import dai.ProjectDataAccess;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import org.json.simple.parser.ParseException;
+import utils.DialogUtils;
 import utils.iou.FileChooserUtils;
 import utils.iou.JsonUtils;
 
@@ -19,36 +23,48 @@ import java.io.IOException;
 public enum ProjectController {
     SIMPLE_PROJECT;
 
-    private static Project project;
+    private static Property<Project> project;
+    private static BooleanProperty hasProject;
+
+    static {
+        project = new SimpleObjectProperty<>();
+        hasProject = new SimpleBooleanProperty();
+        project.addListener((observable, oldValue, newValue) -> hasProject.set(newValue != null));
+    }
 
     public static Project getNewProject(ProjectController type) {
         ProjectController.closeProject();
+        String name = DialogUtils.showNameDialog();
+        // TODO: check if name.isEmpty()
         switch (type) {
             case SIMPLE_PROJECT:
-                try { // TODO: remove try
-                    project = new SimpleProject(new GraphSinglePageScheme(new GraphPage(new EuclideanGraph())));
+                GraphMultiPageScheme scheme = new GraphMultiPageScheme();
+                try {
+                    scheme.addPage(new GraphPage(new EuclideanGraph()));
+                    ((STBPage) scheme.getPages().get(0)).setName("page #1");
+                    scheme.setCurrentPage((GraphPage) scheme.getPages().get(0));
                 } catch (IllegalComponentException e) {
                     e.printStackTrace();
                 }
+                project.setValue(new SimpleProject(scheme, name));
                 break;
             default:
                 break;
         }
-        return project;
+        return project.getValue();
     };
 
     public static boolean saveProject() {
-        if (project == null) return false;
-        // TODO: ownerWindow = MainWindow ?
-        File directory = FileChooserUtils.getProjectDirectoryChooser(project.getFile()).showDialog(null);
+        if (project.getValue() == null) return false;
+        File directory = FileChooserUtils.getProjectDirectoryChooser(project.getValue().getFile()).showDialog(null);
         if (directory != null) {
             try {
                 // TODO: ask user if project already exist
                 JsonUtils.writeJsonToFile(
-                        PageDataAccess.EUCLIDEAN.toJson((STBGraph) project.getCurrentPage().getAllComponents().get(0)),
-                        new File(directory.getPath() + "/" + project.hashCode() + ".stb")
+                        ProjectDataAccess.SIMPLE.toJson(project.getValue()),
+                        new File(directory.getPath() + "/" + project.getValue().getName() + ".stb")
                 );
-                project.setFile(directory);
+                project.getValue().setFile(directory);
                 return true;
             } catch (IOException e) {
                 // TODO: show some information to user
@@ -60,14 +76,14 @@ public enum ProjectController {
 
     public static Project openProject() {
         ProjectController.closeProject();
-        // TODO: ownerWindow = MainWindow ?
         File projectFile = FileChooserUtils.getProjectFileChooser(null).showOpenDialog(null);
         // TODO: read configuration and do the needful
         if (projectFile != null) {
             try {
-                project = new SimpleProject(new GraphSinglePageScheme(new GraphPage(PageDataAccess.EUCLIDEAN.fromJson(JsonUtils.readJsonFromFile(projectFile)))));
-                project.setFile(new File(projectFile.getParentFile().getPath()));
-                return project;
+                // TODO: check project type
+                project.setValue(ProjectDataAccess.SIMPLE.fromJson(JsonUtils.readJsonFromFile(projectFile)));
+                project.getValue().setFile(new File(projectFile.getParentFile().getPath()));
+                return project.getValue();
             } catch (IOException e) {
                 // TODO: show some information to user
                 e.printStackTrace();
@@ -84,11 +100,11 @@ public enum ProjectController {
 
     public static boolean closeProject() {
         // TODO: ask user to save project if it has changes
-        project = null;
+        project.setValue(null);
         return true;
     }
 
-    public static boolean hasProject() {
-        return project != null;
+    public static BooleanProperty hasProject() {
+        return hasProject;
     }
 }

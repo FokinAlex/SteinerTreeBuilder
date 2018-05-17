@@ -42,4 +42,27 @@ public final class DialogUtils {
         Optional<Pair<Double, Double>> optional = NEW_EUCLIDEAN_TERMINAL_DIALOG.showAndWait();
         return optional.isPresent() ? optional.get() : null;
     }
+
+    public static String showNameDialog() {
+        Dialog<String> dialog = new Dialog();
+        dialog.setTitle("Name dialog");
+        GridPane pane = new GridPane();
+        pane.setHgap(10);
+        pane.setVgap(10);
+        pane.setPadding(new Insets(10, 10, 10, 10));
+
+        Label information = new Label("Write new name here:");
+        pane.add(information, 0,0);
+
+        TextField nameField = new TextField();
+        pane.add(nameField, 1, 0);
+
+        ButtonType okType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okType, ButtonType.CANCEL);
+        dialog.getDialogPane().setContent(pane);
+        dialog.setResultConverter(button -> okType.equals(button) ? nameField.getText() : null);
+
+        Optional<String> optional = dialog.showAndWait();
+        return optional.isPresent() ? optional.get() : null;
+    }
 }
