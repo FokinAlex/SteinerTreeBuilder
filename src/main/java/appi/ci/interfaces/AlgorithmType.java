@@ -6,4 +6,5 @@ import core.interfaces.STBComponent;
 public interface AlgorithmType {
 
     STBAlgorithm getInstance(STBComponent argument);
+    String shortName();
 }

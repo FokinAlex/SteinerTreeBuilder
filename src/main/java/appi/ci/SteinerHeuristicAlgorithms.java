@@ -23,6 +23,11 @@ public enum SteinerHeuristicAlgorithms implements STBHeuristicAlgorithm, Algorit
         }
 
         @Override
+        public String shortName() {
+            return "IOA";
+        }
+
+        @Override
         public void run() {
             this.algorithm.run();
         }
@@ -40,6 +45,6 @@ public enum SteinerHeuristicAlgorithms implements STBHeuristicAlgorithm, Algorit
     };
 
     public static Map<String, SteinerHeuristicAlgorithms> ALGORITHMS = new HashMap<String, SteinerHeuristicAlgorithms>() {{
-        this.put("Incremental optimization algorithm", INCREMENTAL_OPTIMIZATION_ALGORITHM);
+        this.put("Incremental Optimization Algorithm", INCREMENTAL_OPTIMIZATION_ALGORITHM);
     }};
 }
