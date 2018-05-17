@@ -1,19 +1,20 @@
 package appi.ci.implementations.abstractions;
 
 import appi.ci.interfaces.Project;
+import core.implementations.GraphMultiPageScheme;
 import core.implementations.GraphPage;
-import core.implementations.GraphSinglePageScheme;
 
 import java.io.File;
 import java.util.List;
 
-public abstract class AbstractProject<Scheme extends GraphSinglePageScheme<Page>, Page extends GraphPage> implements Project<Scheme, Page> {
+public abstract class AbstractProject<Scheme extends GraphMultiPageScheme<Page>, Page extends GraphPage> implements Project<Scheme, Page> {
 
     protected Scheme scheme;
     protected File file;
 
-    public AbstractProject(Scheme scheme) {
+    public AbstractProject(Scheme scheme, String name) {
         this.scheme = scheme;
+        this.setName(name);
     }
 
     @Override
@@ -50,5 +51,15 @@ public abstract class AbstractProject<Scheme extends GraphSinglePageScheme<Page>
     @Override
     public boolean setCurrentPage(Page page) {
         return this.scheme.setCurrentPage(page);
+    }
+
+    @Override
+    public String getName() {
+        return this.scheme.getName();
+    }
+
+    @Override
+    public void setName(String name) {
+        this.scheme.setName(name);
     }
 }

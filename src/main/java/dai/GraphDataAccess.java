@@ -14,17 +14,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public enum PageDataAccess {
+public enum GraphDataAccess {
     // TODO: this need some fragmentation when more then one
     EUCLIDEAN {
         @Override
         public JSONObject toJson(STBGraph graph) {
-            JSONObject root = new JSONObject();
             JSONObject jGraph = new JSONObject();
             JSONArray jTerminals = new JSONArray();
             JSONArray jEdges = new JSONArray();
 
-            root.put("graph", jGraph);
             jGraph.put("terminals", jTerminals);
             graph.getAllVertexes().forEach(terminal -> {
                 JSONObject jTerminal = new JSONObject();
@@ -50,7 +48,7 @@ public enum PageDataAccess {
                 jEdge.put("edge", jEdgesValues);
                 jEdges.add(jEdge);
             });
-            return root;
+            return jGraph;
         }
 
         @Override

@@ -1,9 +1,6 @@
 package gui;
 
-import appi.ci.GraphPagePaneController;
-import appi.ci.ProjectController;
-import appi.ci.SteinerExactAlgorithms;
-import appi.ci.SteinerHeuristicAlgorithms;
+import appi.ci.*;
 import appi.ci.interfaces.Project;
 import core.implementations.GraphPage;
 import javafx.fxml.FXML;
@@ -35,8 +32,17 @@ public class MainWindowController {
 
     // "Project" menu:
     @FXML private Menu projectMenu;
+    @FXML private MenuItem addPageMI;
+    @FXML private MenuItem projectPropertiesMI;
+
+    // "Page" menu:
+    @FXML private Menu pageMenu;
     @FXML private MenuItem addTerminalMI;
-    @FXML private RadioMenuItem addEdgeRMI;
+    @FXML private MenuItem addEdgeMI;
+    @FXML private RadioMenuItem addEdgesRMI;
+    @FXML private MenuItem renamePageMI;
+    @FXML private MenuItem closePageMI;
+    @FXML private MenuItem removePageMI;
 
     // "Algorithms" menu:
     @FXML private Menu algorithmsMenu;
@@ -44,7 +50,7 @@ public class MainWindowController {
     @FXML private Menu steinerHeuristicAlgorithms;
 
     // Panes:
-    @FXML private ScrollPane projectViewPane;
+    @FXML private AnchorPane projectViewPane;
     @FXML private AnchorPane projectPropertiesPane;
     @FXML private ScrollPane terminalPropertiesPane;
     @FXML private TextField terminalXValue;
@@ -64,21 +70,23 @@ public class MainWindowController {
     @FXML private Label leftStatus;
     @FXML private Label rightStatus;
 
-    private GraphPagePaneController graphPageController;
+    private ProjectPagesController pagesController;
 
     // Actions:
     @FXML
     public void initialize() {
         this.terminalPropertiesPane.visibleProperty().set(false);
         this.edgePropertiesPane.visibleProperty().set(false);
+        this.projectMenu.disableProperty().bind(ProjectController.hasProject().not());
+        this.algorithmsMenu.disableProperty().bind(pageMenu.disableProperty());
         SteinerExactAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
-            menuItem.setOnAction(event -> this.graphPageController.execute(type));
+            menuItem.setOnAction(event -> this.pagesController.execute(type));
             this.steinerExactAlgorithms.getItems().add(menuItem);
         });
         SteinerHeuristicAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
-            menuItem.setOnAction(event -> this.graphPageController.execute(type));
+            menuItem.setOnAction(event -> this.pagesController.execute(type));
             this.steinerHeuristicAlgorithms.getItems().add(menuItem);
         });
     }
@@ -88,7 +96,6 @@ public class MainWindowController {
         setLeftStatus("New project action");
         // TODO: user must chooser project type
         uploadProjectWorkspace(ProjectController.getNewProject(ProjectController.SIMPLE_PROJECT));
-        // TODO: move bindings out of here
         setBindings();
         return true;
     }
@@ -96,7 +103,6 @@ public class MainWindowController {
     @FXML
     public boolean openProjectAction() {
         setLeftStatus("Open project action");
-        // TODO: user must choose file
         uploadProjectWorkspace(ProjectController.openProject());
         setBindings();
         return true;
@@ -112,7 +118,12 @@ public class MainWindowController {
     @FXML
     public boolean closeProjectAction() {
         setLeftStatus("Close project action");
-        return ProjectController.closeProject();
+        this.terminalPropertiesPane.visibleProperty().unbind();
+        this.terminalPropertiesPane.setVisible(false);
+        this.edgePropertiesPane.visibleProperty().unbind();
+        this.edgePropertiesPane.setVisible(false);
+        if (ProjectController.closeProject()) projectViewPane.getChildren().remove(0);
+        return true;
     }
 
     @FXML
@@ -158,12 +169,25 @@ public class MainWindowController {
     }
 
     @FXML
+    public boolean addPageAction() {
+        setLeftStatus("Add page action");
+        this.pagesController.addNewGraphPage(DialogUtils.showNameDialog());
+        return true;
+    }
+
+    @FXML
+    public boolean showProjectPropertiesPageAction() {
+        setLeftStatus("Show project properties action");
+        return false;
+    }
+
+    @FXML
     public boolean addTerminalAction() {
         setLeftStatus("Add node action");
         // TODO: block button if no project
         Pair<Double, Double> result = DialogUtils.showNewEuclideanTerminalDialog();
         if (result != null) {
-            this.graphPageController.addPoint(result.getKey(), result.getValue());
+            this.pagesController.getCurrentPageController().addPoint(result.getKey(), result.getValue());
             return true;
         }
         return false;
@@ -172,50 +196,72 @@ public class MainWindowController {
     @FXML
     public boolean addEdgeAction() {
         setLeftStatus("Add edge action");
-        this.graphPageController.edgeAdditionMode(this.addEdgeRMI.isSelected());
+        this.pagesController.setSingleEdgeAdditionModeProperty(true);
+        this.addEdgesRMI.setSelected(false);
         return true;
+    }
+
+    @FXML
+    public boolean addEdgesAction() {
+        setLeftStatus("Add edges action");
+        this.pagesController.setEdgeAdditionModeProperty(this.addEdgesRMI.isSelected());
+        return true;
+    }
+
+    @FXML
+    public boolean renamePageAction() {
+        setLeftStatus("Rename page action");
+        return this.pagesController.renameCurrentPage(DialogUtils.showNameDialog());
+    }
+
+    @FXML
+    public boolean closePageAction() {
+        setLeftStatus("Close page action");
+        return this.pagesController.getTabs().remove(this.pagesController.getSelectionModel().getSelectedItem());
+    }
+
+    @FXML
+    public boolean removePageAction() {
+        setLeftStatus("Remove page action");
+        return this.pagesController.removePage(this.pagesController.getSelectionModel().getSelectedItem());
     }
 
     @FXML
     private boolean deleteTerminalAction() {
         setLeftStatus("Delete terminal action");
-        this.graphPageController.deleteSelectedPoint();
+        this.pagesController.getCurrentPageController().deleteSelectedPoint();
         return true;
     }
 
     @FXML
     private boolean deleteEdgeAction() {
         setLeftStatus("Delete edge action");
-        this.graphPageController.deleteSelectedEdge();
+        this.pagesController.getCurrentPageController().deleteSelectedEdge();
         return true;
     }
 
-    private void setBindings() {
-        terminalPropertiesPane.visibleProperty()
-                .bind(graphPageController.selectedTerminalProperty());
-        edgePropertiesPane.visibleProperty()
-                .bind(graphPageController.selectedEdgeProperty());
-        graphPageController.setSelectedPointXPropertyFollower(terminalXValue.textProperty());
-        graphPageController.setSelectedPointYPropertyFollower(terminalYValue.textProperty());
-        graphPageController.setFirstPointXPropertyFollower(edgeFirstEndpointXValue.textProperty());
-        graphPageController.setFirstPointYPropertyFollower(edgeFirstEndpointYValue.textProperty());
-        graphPageController.setSecondPointXPropertyFollower(edgeSecondEndpointXValue.textProperty());
-        graphPageController.setSecondPointYPropertyFollower(edgeSecondEndpointYValue.textProperty());
-        graphPageController.setEdgeLengthPropertyFollower(edgeLenghtValue.textProperty());
-    }
-
-
     private boolean uploadProjectWorkspace(Project project) {
         if (project != null) {
-            this.projectViewPane.setContent(null);
-            PagePane pagePane = new PagePane();
-            this.graphPageController = new GraphPagePaneController(pagePane, (GraphPage) project.getCurrentPage());
-            this.projectViewPane.setContent(pagePane);
-            this.algorithmsMenu.setDisable(false);
-            this.projectMenu.setDisable(false);
+            this.projectViewPane.getChildren().removeIf(node -> true);
+            // TODO reorganize it
+            this.pagesController = new ProjectPagesController(project);
+            this.projectViewPane.getChildren().add(this.pagesController);
             return true;
         }
         return false;
+    }
+
+    private void setBindings() {
+        this.terminalPropertiesPane.visibleProperty().bind(this.pagesController.selectedPointProperty());
+        this.edgePropertiesPane.visibleProperty().bind(this.pagesController.selectedEdgeProperty());
+        this.pagesController.setHasCurrentPagePropertyFollower(this.pageMenu.disableProperty());
+        this.pagesController.setSelectedPointXPropertyFollower(this.terminalXValue.textProperty());
+        this.pagesController.setSelectedPointYPropertyFollower(this.terminalYValue.textProperty());
+        this.pagesController.setFirstPointXPropertyFollower(this.edgeFirstEndpointXValue.textProperty());
+        this.pagesController.setFirstPointYPropertyFollower(this.edgeFirstEndpointYValue.textProperty());
+        this.pagesController.setSecondPointXPropertyFollower(this.edgeSecondEndpointXValue.textProperty());
+        this.pagesController.setSecondPointYPropertyFollower(this.edgeSecondEndpointYValue.textProperty());
+        this.pagesController.setEdgeLengthPropertyFollower(this.edgeLenghtValue.textProperty());
     }
 
     private void setLeftStatus(String leftStatus) {

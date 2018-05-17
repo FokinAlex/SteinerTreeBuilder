@@ -2,7 +2,7 @@ package core.interfaces;
 
 import java.util.List;
 
-public interface STBScheme<Page extends STBPage> {
+public interface STBScheme<Page extends STBPage> extends STBNamed {
 
     List<Page> getPages();
     boolean addPage(Page page);

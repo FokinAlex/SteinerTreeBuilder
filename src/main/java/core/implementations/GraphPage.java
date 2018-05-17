@@ -9,10 +9,12 @@ import java.util.List;
 public class GraphPage<Graph extends STBGraph, Component extends STBComponent> implements STBPage<Component> {
 
     private Graph graph;
+    private String name;
 
     public GraphPage(Graph graph) throws IllegalComponentException {
         if (graph == null) throw new IllegalComponentException("GraphPage's graph can not be null", null);
         this.graph = graph;
+        this.name = this.graph.getClass().getSimpleName() + this.graph.hashCode();
     }
 
     @Deprecated
@@ -47,5 +49,15 @@ public class GraphPage<Graph extends STBGraph, Component extends STBComponent> i
                     this.graph.removeEdges(((STBGraph) component).getAllEdges());
         }
         return false;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
     }
 }
