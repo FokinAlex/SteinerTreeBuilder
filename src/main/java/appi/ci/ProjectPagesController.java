@@ -65,7 +65,7 @@ public class ProjectPagesController extends TabPane {
     }
 
     public void execute(AlgorithmType type) {
-        Tab tab = this.addNewGraphPage(this.currentPageController.getValue().getPage().getName() + " IOA result");
+        Tab tab = this.addNewGraphPage(this.currentPageController.getValue().getPage().getName() + " " + type.shortName() + " result" );
         this.currentPageController.getValue().execute(type, this.tabs.get(tab));
         this.getSelectionModel().select(tab);
     }
