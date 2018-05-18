@@ -2,12 +2,17 @@ package core.implementations.euclidean;
 
 import core.implementations.abstractions.AbstractEdge;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 public class EuclideanEdge<Terminal extends EuclideanTerminal> extends AbstractEdge<Terminal> {
 
+    private DoubleProperty euclideanSquare;
+
     public EuclideanEdge(Terminal firstEndpoint, Terminal secondEndpoint) {
         super(firstEndpoint, secondEndpoint);
-        this.lengthProperty = (EuclideanMetric.METRIC.apply(this.firstEndpoint.getLocation(), this.secondEndpoint.getLocation()));
+        this.euclideanSquare = EuclideanSquareMetric.METRIC.apply(this.firstEndpoint.getLocation(), this.secondEndpoint.getLocation());
+        this.euclideanSquare.addListener((observable, oldValue, newValue) -> this.lengthProperty.set(Math.sqrt((double) newValue)));
+        this.lengthProperty = new SimpleDoubleProperty(Math.sqrt(euclideanSquare.get()));
     }
 
     @Override

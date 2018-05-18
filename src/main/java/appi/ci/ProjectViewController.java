@@ -43,8 +43,10 @@ public class ProjectViewController extends TabPane {
     private StringProperty secondPointYProperty;
 
     private StringProperty edgeLengthStringProperty;
+    private StringProperty graphWeightStringProperty;
 
-    private ChangeListener<Number> edgeLengthListener = (observable, oldValue, newValue) -> edgeLengthStringProperty.set("Length: " + ((Math.round((Double) newValue * 1000) / 1000.)));
+    private ChangeListener<Number> edgeLengthListener = (observable, oldValue, newValue) -> edgeLengthStringProperty.set("Length: " + ((Math.round((Double) newValue * 100_000) / 100_000.)));
+    private ChangeListener<Number> graphWeightListener = (observable, oldValue, newValue) -> graphWeightStringProperty.set("Weight: " + newValue);
 
     private ProjectTreeViewController projectTreeViewController;
 
@@ -87,6 +89,8 @@ public class ProjectViewController extends TabPane {
             target.edgeAdditionModeProperty().bind(this.edgeAdditionModeProperty);
             target.restoreProperties();
             target.edgeLengthProperty().addListener(this.edgeLengthListener);
+            if (null != this.graphWeightStringProperty) this.graphWeightStringProperty.set("Weight: " + target.getPage().getGraph().getWeight());
+            target.getPage().getGraph().weightProperty().addListener(this.graphWeightListener);
         }
     }
 
@@ -98,6 +102,7 @@ public class ProjectViewController extends TabPane {
             target.edgeAdditionModeProperty().unbind();
             target.clearProperties();
             target.edgeLengthProperty().removeListener(this.edgeLengthListener);
+            target.getPage().getGraph().weightProperty().removeListener(this.graphWeightListener);
         }
     }
 
@@ -238,6 +243,11 @@ public class ProjectViewController extends TabPane {
         this.hasntCurrentPage = property;
         this.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> this.hasntCurrentPage.set(newValue == null));
         if (this.getSelectionModel().getSelectedItem() != null) this.hasntCurrentPage.set(false);
+    }
+
+    public void setGraphWeightPropertyFollower(StringProperty property) {
+        this.graphWeightStringProperty = property;
+        if (null != this.currentPageController) this.graphWeightStringProperty.set("Weight: " + this.currentPageController.getValue().getPage().getGraph().getWeight());
     }
 
     public void setEdgeLengthPropertyFollower(StringProperty property) {
