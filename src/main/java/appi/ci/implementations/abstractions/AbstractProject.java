@@ -3,6 +3,8 @@ package appi.ci.implementations.abstractions;
 import appi.ci.interfaces.Project;
 import core.implementations.GraphMultiPageScheme;
 import core.implementations.GraphPage;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.io.File;
 import java.util.List;
@@ -11,10 +13,11 @@ public abstract class AbstractProject<Scheme extends GraphMultiPageScheme<Page>,
 
     protected Scheme scheme;
     protected File file;
+    protected StringProperty nameProperty;
 
     public AbstractProject(Scheme scheme, String name) {
         this.scheme = scheme;
-        this.setName(name);
+        this.nameProperty = new SimpleStringProperty(name);
     }
 
     @Override
@@ -54,12 +57,7 @@ public abstract class AbstractProject<Scheme extends GraphMultiPageScheme<Page>,
     }
 
     @Override
-    public String getName() {
-        return this.scheme.getName();
-    }
-
-    @Override
-    public void setName(String name) {
-        this.scheme.setName(name);
+    public StringProperty nameProperty() {
+        return nameProperty;
     }
 }

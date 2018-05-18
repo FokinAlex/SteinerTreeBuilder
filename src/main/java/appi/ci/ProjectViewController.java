@@ -9,15 +9,18 @@ import gui.PagePane;
 import gui.PagePoint;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProjectPagesController extends TabPane {
+public class ProjectViewController extends TabPane {
 
     private Project project;
     private Map<Tab, GraphPagePaneController> tabs;
@@ -43,9 +46,15 @@ public class ProjectPagesController extends TabPane {
 
     private ChangeListener<Number> edgeLengthListener = (observable, oldValue, newValue) -> edgeLengthStringProperty.set("Length: " + ((Math.round((Double) newValue * 1000) / 1000.)));
 
-    public ProjectPagesController(Project project) {
+    private ProjectTreeViewController projectTreeViewController;
+
+    public ProjectViewController(Project project, TreeView treeView) {
         this.project = project;
         this.tabs = new HashMap<>();
+        this.projectTreeViewController = new ProjectTreeViewController(treeView, project);
+        this.projectTreeViewController.getClickedPageProperty().addListener((observable, oldValue, newValue) -> {
+            if (null != newValue) this.addNewGraphPage((GraphPage) newValue);
+        });
         AnchorPane.setTopAnchor(this, 0.);
         AnchorPane.setLeftAnchor(this, 0.);
         AnchorPane.setRightAnchor(this, 0.);
@@ -59,13 +68,14 @@ public class ProjectPagesController extends TabPane {
             this.currentPageController.setValue(this.tabs.get(newValue));
             this.bindings(tabs.get(newValue));
         });
+
         this.currentPageController.setValue(this.tabs.get(this.getSelectionModel().getSelectedItem()));
         this.currentTab = this.getSelectionModel().getSelectedItem();
         this.bindings(currentPageController.getValue());
     }
 
     public void execute(AlgorithmType type) {
-        Tab tab = this.addNewGraphPage(this.currentPageController.getValue().getPage().getName() + " " + type.shortName() + " result" );
+        Tab tab = this.addNewGraphPage(this.currentPageController.getValue().getPage().nameProperty().get() + " " + type.shortName() + " result" );
         this.currentPageController.getValue().execute(type, this.tabs.get(tab));
         this.getSelectionModel().select(tab);
     }
@@ -95,7 +105,7 @@ public class ProjectPagesController extends TabPane {
         try {
             //TODO: ask type
             GraphPage page = new GraphPage(new EuclideanGraph());
-            if (name != null && !name.isEmpty()) page.setName(name);
+            if (name != null && !name.isEmpty()) page.nameProperty().set(name);
             this.project.addPage(page);
             return this.addNewGraphPage(page);
         } catch (IllegalComponentException e) {
@@ -115,7 +125,8 @@ public class ProjectPagesController extends TabPane {
         pageController.setFirstPointYPropertyFollower(this.firstPointYProperty);
         pageController.setSecondPointXPropertyFollower(this.secondPointXProperty);
         pageController.setSecondPointYPropertyFollower(this.secondPointYProperty);
-        Tab tab = new Tab(page.getName());
+        Tab tab = new Tab(page.nameProperty().get());
+        tab.setOnClosed(event -> this._closeTab(tab)); //this.projectTreeViewController.closeItem(page));
         ScrollPane wrap = new ScrollPane();
         wrap.setOnMouseClicked(event -> {
             if (this.terminalAddtionModeProperty.get())
@@ -128,19 +139,30 @@ public class ProjectPagesController extends TabPane {
         tab.setContent(wrap);
         tabs.put(tab, pageController);
         this.getTabs().add(tab);
+        this.projectTreeViewController.addItem(page);
         return tab;
     }
 
-    public boolean removePage(Tab tab) {
-        this.getSelectionModel().selectFirst();
-        GraphPagePaneController controller = this.tabs.remove(tab);
-        return this.getTabs().remove(tab) & this.project.removePage(controller.getPage());
+    public void closeTab(Tab tab) {
+        EventHandler<Event> handler = tab.getOnClosed();
+        if (null != handler) handler.handle(null);
+    }
+
+    private boolean _closeTab(Tab tab) {
+        this.projectTreeViewController.closeItem(this.tabs.get(tab).getPage());
+        this.tabs.remove(tab);
+        return this.getTabs().remove(tab);
+    }
+
+    public boolean removeTab(Tab tab) {
+        this.projectTreeViewController.removeItem(this.tabs.get(tab).getPage());
+        return this.getTabs().remove(tab) & this.project.removePage(this.tabs.remove(tab).getPage());
     }
 
     public boolean renameCurrentPage(String name) {
         if (name != null && !name.isEmpty()) {
             this.currentTab.setText(name);
-            this.currentPageController.getValue().getPage().setName(name);
+            this.currentPageController.getValue().getPage().nameProperty().set(name);
             return true;
         }
         return false;

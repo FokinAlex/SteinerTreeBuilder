@@ -32,6 +32,7 @@ public class MainWindowController {
     // "Project" menu:
     @FXML private Menu projectMenu;
     @FXML private MenuItem addPageMI;
+    @FXML private MenuItem renameProjectMI;
     @FXML private MenuItem projectPropertiesMI;
 
     // "Page" menu:
@@ -51,10 +52,17 @@ public class MainWindowController {
 
     // Panes:
     @FXML private AnchorPane projectViewPane;
+
     @FXML private AnchorPane projectPropertiesPane;
+
+    @FXML private TreeView projectTV;
+
+    @FXML private Label propertiesText;
+
     @FXML private ScrollPane terminalPropertiesPane;
     @FXML private TextField terminalXValue;
     @FXML private TextField terminalYValue;
+    @FXML private Button deleteTerminal;
 
     @FXML private ScrollPane edgePropertiesPane;
     @FXML private TextField edgeFirstEndpointXValue;
@@ -62,15 +70,14 @@ public class MainWindowController {
     @FXML private TextField edgeSecondEndpointXValue;
     @FXML private TextField edgeSecondEndpointYValue;
     @FXML private Label edgeLenghtValue;
-
-    @FXML private Button deleteTerminal;
     @FXML private Button deleteEdge;
+
 
     // Footer:
     @FXML private Label leftStatus;
     @FXML private Label rightStatus;
 
-    private ProjectPagesController pagesController;
+    private ProjectViewController pagesController;
 
     // Actions:
     @FXML
@@ -79,6 +86,8 @@ public class MainWindowController {
         this.edgePropertiesPane.visibleProperty().set(false);
         this.projectMenu.disableProperty().bind(ProjectController.hasProject().not());
         this.algorithmsMenu.disableProperty().bind(pageMenu.disableProperty());
+        this.propertiesText.visibleProperty().bind(ProjectController.hasProject());
+        this.projectTV.visibleProperty().bind(ProjectController.hasProject());
         SteinerExactAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
             menuItem.setOnAction(event -> this.pagesController.execute(type));
@@ -122,6 +131,7 @@ public class MainWindowController {
         this.terminalPropertiesPane.setVisible(false);
         this.edgePropertiesPane.visibleProperty().unbind();
         this.edgePropertiesPane.setVisible(false);
+        this.projectTV.setRoot(null);
         if (ProjectController.closeProject()) projectViewPane.getChildren().remove(0);
         return true;
     }
@@ -171,7 +181,15 @@ public class MainWindowController {
     @FXML
     public boolean addPageAction() {
         setLeftStatus("Add page action");
-        this.pagesController.addNewGraphPage(DialogUtils.showNameDialog());
+        this.pagesController.addNewGraphPage(DialogUtils.showNameDialog(""));
+        return true;
+    }
+
+    @FXML
+    public boolean renameProjectAction() {
+        setLeftStatus("Rename project action");
+        String name = DialogUtils.showNameDialog(ProjectController.getProjectName());
+        ProjectController.renameProject(name);
         return true;
     }
 
@@ -198,7 +216,7 @@ public class MainWindowController {
         this.pagesController.setTerminalAdditionModeProperty(this.addTerminalsRMI.isSelected());
         this.pagesController.setSingleEdgeAdditionModeProperty(false);
         this.addEdgesRMI.setSelected(false);
-        return false;
+        return true;
     }
 
     @FXML
@@ -221,19 +239,20 @@ public class MainWindowController {
     @FXML
     public boolean renamePageAction() {
         setLeftStatus("Rename page action");
-        return this.pagesController.renameCurrentPage(DialogUtils.showNameDialog());
+        return this.pagesController.renameCurrentPage(DialogUtils.showNameDialog(this.pagesController.getCurrentPageController().getPage().nameProperty().getValue()));
     }
 
     @FXML
     public boolean closePageAction() {
         setLeftStatus("Close page action");
-        return this.pagesController.getTabs().remove(this.pagesController.getSelectionModel().getSelectedItem());
+        this.pagesController.closeTab(this.pagesController.getSelectionModel().getSelectedItem());
+        return true;
     }
 
     @FXML
     public boolean removePageAction() {
         setLeftStatus("Remove page action");
-        return this.pagesController.removePage(this.pagesController.getSelectionModel().getSelectedItem());
+        return this.pagesController.removeTab(this.pagesController.getSelectionModel().getSelectedItem());
     }
 
     @FXML
@@ -253,8 +272,7 @@ public class MainWindowController {
     private boolean uploadProjectWorkspace(Project project) {
         if (project != null) {
             this.projectViewPane.getChildren().removeIf(node -> true);
-            // TODO reorganize it
-            this.pagesController = new ProjectPagesController(project);
+            this.pagesController = new ProjectViewController(project, this.projectTV);
             this.projectViewPane.getChildren().add(this.pagesController);
             return true;
         }

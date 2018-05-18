@@ -34,14 +34,14 @@ public enum ProjectController {
 
     public static Project getNewProject(ProjectController type) {
         ProjectController.closeProject();
-        String name = DialogUtils.showNameDialog();
+        String name = DialogUtils.showNameDialog("");
         // TODO: check if name.isEmpty()
         switch (type) {
             case SIMPLE_PROJECT:
                 GraphMultiPageScheme scheme = new GraphMultiPageScheme();
                 try {
                     scheme.addPage(new GraphPage(new EuclideanGraph()));
-                    ((STBPage) scheme.getPages().get(0)).setName("page #1");
+                    ((STBPage) scheme.getPages().get(0)).nameProperty().set("page #1");
                     scheme.setCurrentPage((GraphPage) scheme.getPages().get(0));
                 } catch (IllegalComponentException e) {
                     e.printStackTrace();
@@ -62,7 +62,7 @@ public enum ProjectController {
                 // TODO: ask user if project already exist
                 JsonUtils.writeJsonToFile(
                         ProjectDataAccess.SIMPLE.toJson(project.getValue()),
-                        new File(directory.getPath() + "/" + project.getValue().getName() + ".stb")
+                        new File(directory.getPath() + "/" + project.getValue().nameProperty().get() + ".stb")
                 );
                 project.getValue().setFile(directory);
                 return true;
@@ -102,6 +102,14 @@ public enum ProjectController {
         // TODO: ask user to save project if it has changes
         project.setValue(null);
         return true;
+    }
+
+    public static void renameProject(String name) {
+        if (name != null && !name.isEmpty()) project.getValue().nameProperty().set(name);
+    }
+
+    public static String getProjectName() {
+        return project.getValue().nameProperty().get();
     }
 
     public static BooleanProperty hasProject() {
