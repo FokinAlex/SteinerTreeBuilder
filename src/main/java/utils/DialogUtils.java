@@ -43,7 +43,7 @@ public final class DialogUtils {
         return optional.isPresent() ? optional.get() : null;
     }
 
-    public static String showNameDialog() {
+    public static String showNameDialog(String oldValue) {
         Dialog<String> dialog = new Dialog();
         dialog.setTitle("Name dialog");
         GridPane pane = new GridPane();
@@ -54,7 +54,7 @@ public final class DialogUtils {
         Label information = new Label("Write new name here:");
         pane.add(information, 0,0);
 
-        TextField nameField = new TextField();
+        TextField nameField = new TextField(oldValue);
         pane.add(nameField, 1, 0);
 
         ButtonType okType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);

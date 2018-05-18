@@ -1,6 +1,7 @@
 package core.implementations;
 
 import core.interfaces.STBScheme;
+import javafx.beans.property.StringProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,12 +44,7 @@ public class GraphMultiPageScheme<Page extends GraphPage> implements STBScheme<P
     }
 
     @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
+    public StringProperty nameProperty() {
+        return null;
     }
 }

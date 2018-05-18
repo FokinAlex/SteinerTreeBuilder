@@ -11,6 +11,7 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -46,6 +47,7 @@
             <Menu fx:id="projectMenu" disable="true" mnemonicParsing="false" text="Project">
               <items>
                 <MenuItem fx:id="addPageMI" mnemonicParsing="false" onAction="#addPageAction" text="Add new Page" />
+                  <MenuItem fx:id="renameProjectMI" mnemonicParsing="false" onAction="#renameProjectAction" text="Rename Project" />
                   <MenuItem fx:id="projectPropertiesMI" disable="true" mnemonicParsing="false" onAction="#showProjectPropertiesPageAction" text="Properties" />
               </items>
             </Menu>
@@ -78,25 +80,26 @@
             <AnchorPane fx:id="projectViewPane" prefHeight="200.0" prefWidth="200.0" />
         <AnchorPane fx:id="projectPropertiesPane" maxWidth="220.0" minWidth="220.0" prefWidth="220.0">
                <children>
-                  <Label layoutX="78.0" layoutY="17.0" text="Properties" AnchorPane.leftAnchor="76.0" AnchorPane.rightAnchor="76.0" AnchorPane.topAnchor="10.0" />
-                  <ScrollPane fx:id="terminalPropertiesPane" maxWidth="200.0" minWidth="200.0" prefHeight="504.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="30.0">
+                  <TreeView fx:id="projectTV" layoutX="10.0" maxHeight="150.0" maxWidth="200.0" minHeight="150.0" minWidth="200.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                  <Label fx:id="propertiesText" alignment="CENTER" layoutX="78.0" layoutY="17.0" text="Properties" AnchorPane.leftAnchor="70.0" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="165.0" />
+                  <ScrollPane fx:id="terminalPropertiesPane" maxWidth="200.0" minWidth="200.0" prefHeight="504.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="185.0">
                      <content>
-                        <AnchorPane maxWidth="208.0" minWidth="208.0" prefHeight="509.0" prefWidth="208.0">
+                        <AnchorPane maxWidth="208.0" minWidth="208.0" prefWidth="205.0">
                            <children>
                               <Label layoutX="14.0" layoutY="14.0" text="Terminal" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <Label layoutX="16.0" layoutY="33.0" text="Location:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="30.0" />
                               <Label layoutX="10.0" layoutY="54.0" text="x:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="55.0" />
                               <Label layoutX="37.0" layoutY="152.0" text="y:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="85.0" />
                               <TextField fx:id="terminalXValue" layoutX="34.0" layoutY="60.0" prefWidth="170.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0" />
-                              <TextField fx:id="terminalYValue" layoutX="16.0" layoutY="172.0" prefHeight="26.0" prefWidth="170.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0" />
+                              <TextField fx:id="terminalYValue" layoutX="16.0" layoutY="172.0" prefWidth="170.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0" />
                               <Button fx:id="deleteTerminal" mnemonicParsing="false" onAction="#deleteTerminalAction" prefHeight="26.0" prefWidth="105.0" text="Delete" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="115.0" />
                            </children>
                         </AnchorPane>
                      </content>
                   </ScrollPane>
-                  <ScrollPane fx:id="edgePropertiesPane" layoutX="10.0" layoutY="10.0" maxWidth="200.0" minWidth="200.0" prefHeight="504.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="30.0">
+                  <ScrollPane fx:id="edgePropertiesPane" layoutX="10.0" layoutY="10.0" maxWidth="200.0" minWidth="200.0" prefHeight="504.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="185.0">
                      <content>
-                        <AnchorPane maxWidth="208.0" minWidth="208.0" prefHeight="509.0" prefWidth="208.0">
+                        <AnchorPane maxWidth="208.0" minWidth="208.0" prefWidth="208.0">
                            <children>
                               <Label layoutX="14.0" layoutY="14.0" text="Edge" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <Label layoutX="11.0" layoutY="30.0" text="First endpoint:" AnchorPane.leftAnchor="11.0" AnchorPane.topAnchor="30.0" />

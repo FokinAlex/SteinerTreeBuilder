@@ -1,7 +1,8 @@
 package core.interfaces;
 
+import javafx.beans.property.StringProperty;
+
 public interface STBNamed {
 
-    void setName(String name);
-    String getName();
+    StringProperty nameProperty();
 }

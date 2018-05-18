@@ -22,12 +22,12 @@ public enum ProjectDataAccess {
             JSONArray jPages = new JSONArray();
 
             root.put("project", jProject);
-            jProject.put("name", project.getName());
+            jProject.put("name", project.nameProperty().get());
             jProject.put("pages", jPages);
             project.getPages().forEach(page -> {
                 JSONObject jPage = new JSONObject();
                 JSONObject jPagesValues = new JSONObject();
-                jPagesValues.put("name", ((STBPage) page).getName());
+                jPagesValues.put("name", ((STBPage) page).nameProperty().get());
                 // TODO: check type
                 jPagesValues.put("graph", GraphDataAccess.EUCLIDEAN.toJson((STBGraph) ((STBPage) page).getAllComponents().get(0)));
                 jPage.put("page", jPagesValues);
@@ -51,7 +51,7 @@ public enum ProjectDataAccess {
                 // TODO: check type
                 STBGraph pageGraph = GraphDataAccess.EUCLIDEAN.fromJson((JSONObject) jPage);
                 currentPage = new GraphPage(pageGraph);
-                currentPage.setName(pageName);
+                currentPage.nameProperty().set(pageName);
                 scheme.addPage(currentPage);
             }
             return new SimpleProject((GraphMultiPageScheme) scheme, projectName);
