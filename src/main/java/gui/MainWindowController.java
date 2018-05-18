@@ -5,6 +5,7 @@ import appi.ci.interfaces.Project;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 import utils.DialogUtils;
 
@@ -51,13 +52,20 @@ public class MainWindowController {
     @FXML private Menu steinerHeuristicAlgorithms;
 
     // Panes:
+    @FXML private BorderPane mainPane;
+
+    @FXML private ToolBar toolBar;
+    @FXML private ToggleButton cursorTB;
+    @FXML private ToggleButton addTerminalTB;
+    @FXML private ToggleButton addEdgeTB;
+
     @FXML private AnchorPane projectViewPane;
 
     @FXML private AnchorPane projectPropertiesPane;
 
     @FXML private TreeView projectTV;
 
-    @FXML private Label propertiesText;
+    @FXML private Label graphWeight;
 
     @FXML private ScrollPane terminalPropertiesPane;
     @FXML private TextField terminalXValue;
@@ -72,12 +80,11 @@ public class MainWindowController {
     @FXML private Label edgeLenghtValue;
     @FXML private Button deleteEdge;
 
-
     // Footer:
     @FXML private Label leftStatus;
     @FXML private Label rightStatus;
 
-    private ProjectViewController pagesController;
+    private ProjectViewController projectViewController;
 
     // Actions:
     @FXML
@@ -86,16 +93,18 @@ public class MainWindowController {
         this.edgePropertiesPane.visibleProperty().set(false);
         this.projectMenu.disableProperty().bind(ProjectController.hasProject().not());
         this.algorithmsMenu.disableProperty().bind(pageMenu.disableProperty());
-        this.propertiesText.visibleProperty().bind(ProjectController.hasProject());
+        this.graphWeight.visibleProperty().bind(pageMenu.disableProperty().not());
+        this.toolBar.visibleProperty().bind(pageMenu.disableProperty().not());
         this.projectTV.visibleProperty().bind(ProjectController.hasProject());
+        this.mainPane.visibleProperty().bind(ProjectController.hasProject());
         SteinerExactAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
-            menuItem.setOnAction(event -> this.pagesController.execute(type));
+            menuItem.setOnAction(event -> this.projectViewController.execute(type));
             this.steinerExactAlgorithms.getItems().add(menuItem);
         });
         SteinerHeuristicAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
-            menuItem.setOnAction(event -> this.pagesController.execute(type));
+            menuItem.setOnAction(event -> this.projectViewController.execute(type));
             this.steinerHeuristicAlgorithms.getItems().add(menuItem);
         });
     }
@@ -181,7 +190,7 @@ public class MainWindowController {
     @FXML
     public boolean addPageAction() {
         setLeftStatus("Add page action");
-        this.pagesController.addNewGraphPage(DialogUtils.showNameDialog(""));
+        this.projectViewController.addNewGraphPage(DialogUtils.showNameDialog(""));
         return true;
     }
 
@@ -204,7 +213,7 @@ public class MainWindowController {
         setLeftStatus("Add terminal action");
         Pair<Double, Double> result = DialogUtils.showNewEuclideanTerminalDialog();
         if (result != null) {
-            this.pagesController.getCurrentPageController().addPoint(result.getKey(), result.getValue());
+            this.projectViewController.getCurrentPageController().addPoint(result.getKey(), result.getValue());
             return true;
         }
         return false;
@@ -213,83 +222,105 @@ public class MainWindowController {
     @FXML
     public boolean addTerminalsAction() {
         setLeftStatus("Add terminals action");
-        this.pagesController.setTerminalAdditionModeProperty(this.addTerminalsRMI.isSelected());
-        this.pagesController.setSingleEdgeAdditionModeProperty(false);
+        this.addTerminalTB.setSelected(true);
+        this.addTerminalsRMI.setSelected(true);
+        this.cursorTB.setSelected(false);
+        this.addEdgeTB.setSelected(false);
         this.addEdgesRMI.setSelected(false);
+        this.projectViewController.setSingleEdgeAdditionModeProperty(false);
+        this.projectViewController.setTerminalAdditionModeProperty(this.addTerminalsRMI.isSelected());
         return true;
     }
 
     @FXML
     public boolean addEdgeAction() {
         setLeftStatus("Add edge action");
-        this.pagesController.setSingleEdgeAdditionModeProperty(true);
+        this.cursorTB.setSelected(false);
+        this.addTerminalTB.setSelected(false);
         this.addTerminalsRMI.setSelected(false);
-        this.addEdgesRMI.setSelected(false);
+        this.projectViewController.setSingleEdgeAdditionModeProperty(true);
         return true;
     }
 
     @FXML
     public boolean addEdgesAction() {
         setLeftStatus("Add edges action");
-        this.pagesController.setEdgeAdditionModeProperty(this.addEdgesRMI.isSelected());
+        this.addEdgeTB.setSelected(true);
+        this.addEdgesRMI.setSelected(true);
+        this.cursorTB.setSelected(false);
+        this.addTerminalTB.setSelected(false);
         this.addTerminalsRMI.setSelected(false);
+        this.projectViewController.setEdgeAdditionModeProperty(this.addEdgesRMI.isSelected());
         return true;
     }
 
     @FXML
     public boolean renamePageAction() {
         setLeftStatus("Rename page action");
-        return this.pagesController.renameCurrentPage(DialogUtils.showNameDialog(this.pagesController.getCurrentPageController().getPage().nameProperty().getValue()));
+        return this.projectViewController.renameCurrentPage(DialogUtils.showNameDialog(this.projectViewController.getCurrentPageController().getPage().nameProperty().getValue()));
     }
 
     @FXML
     public boolean closePageAction() {
         setLeftStatus("Close page action");
-        this.pagesController.closeTab(this.pagesController.getSelectionModel().getSelectedItem());
+        this.projectViewController.closeTab(this.projectViewController.getSelectionModel().getSelectedItem());
         return true;
     }
 
     @FXML
     public boolean removePageAction() {
         setLeftStatus("Remove page action");
-        return this.pagesController.removeTab(this.pagesController.getSelectionModel().getSelectedItem());
+        return this.projectViewController.removeTab(this.projectViewController.getSelectionModel().getSelectedItem());
     }
 
     @FXML
     private boolean deleteTerminalAction() {
         setLeftStatus("Delete terminal action");
-        this.pagesController.getCurrentPageController().deleteSelectedPoint();
+        this.projectViewController.getCurrentPageController().deleteSelectedPoint();
         return true;
     }
 
     @FXML
     private boolean deleteEdgeAction() {
         setLeftStatus("Delete edge action");
-        this.pagesController.getCurrentPageController().deleteSelectedEdge();
+        this.projectViewController.getCurrentPageController().deleteSelectedEdge();
+        return true;
+    }
+
+    @FXML
+    private boolean cursorToggleAction() {
+        this.addEdgeTB.setSelected(false);
+        this.addTerminalTB.setSelected(false);
+        this.addTerminalsRMI.setSelected(false);
+        this.addEdgesRMI.setSelected(false);
+        this.projectViewController.setEdgeAdditionModeProperty(false);
+        this.projectViewController.setSingleEdgeAdditionModeProperty(false);
+        this.projectViewController.setTerminalAdditionModeProperty(false);
         return true;
     }
 
     private boolean uploadProjectWorkspace(Project project) {
         if (project != null) {
             this.projectViewPane.getChildren().removeIf(node -> true);
-            this.pagesController = new ProjectViewController(project, this.projectTV);
-            this.projectViewPane.getChildren().add(this.pagesController);
+            this.projectViewController = new ProjectViewController(project, this.projectTV);
+            this.projectViewPane.getChildren().add(this.projectViewController);
             return true;
         }
         return false;
     }
 
     private void setBindings() {
-        this.terminalPropertiesPane.visibleProperty().bind(this.pagesController.selectedPointProperty());
-        this.edgePropertiesPane.visibleProperty().bind(this.pagesController.selectedEdgeProperty());
-        this.pagesController.setHasCurrentPagePropertyFollower(this.pageMenu.disableProperty());
-        this.pagesController.setSelectedPointXPropertyFollower(this.terminalXValue.textProperty());
-        this.pagesController.setSelectedPointYPropertyFollower(this.terminalYValue.textProperty());
-        this.pagesController.setFirstPointXPropertyFollower(this.edgeFirstEndpointXValue.textProperty());
-        this.pagesController.setFirstPointYPropertyFollower(this.edgeFirstEndpointYValue.textProperty());
-        this.pagesController.setSecondPointXPropertyFollower(this.edgeSecondEndpointXValue.textProperty());
-        this.pagesController.setSecondPointYPropertyFollower(this.edgeSecondEndpointYValue.textProperty());
-        this.pagesController.setEdgeLengthPropertyFollower(this.edgeLenghtValue.textProperty());
+        this.terminalPropertiesPane.visibleProperty().bind(this.projectViewController.selectedPointProperty());
+        this.edgePropertiesPane.visibleProperty().bind(this.projectViewController.selectedEdgeProperty());
+        this.projectViewController.setHasCurrentPagePropertyFollower(this.pageMenu.disableProperty());
+        this.projectViewController.setSelectedPointXPropertyFollower(this.terminalXValue.textProperty());
+        this.projectViewController.setSelectedPointYPropertyFollower(this.terminalYValue.textProperty());
+        this.projectViewController.setFirstPointXPropertyFollower(this.edgeFirstEndpointXValue.textProperty());
+        this.projectViewController.setFirstPointYPropertyFollower(this.edgeFirstEndpointYValue.textProperty());
+        this.projectViewController.setSecondPointXPropertyFollower(this.edgeSecondEndpointXValue.textProperty());
+        this.projectViewController.setSecondPointYPropertyFollower(this.edgeSecondEndpointYValue.textProperty());
+        this.projectViewController.setEdgeLengthPropertyFollower(this.edgeLenghtValue.textProperty());
+        this.projectViewController.setGraphWeightPropertyFollower(this.graphWeight.textProperty());
     }
 
     private void setLeftStatus(String leftStatus) {

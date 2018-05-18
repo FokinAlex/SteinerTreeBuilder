@@ -1,5 +1,7 @@
 package core.interfaces;
 
+import javafx.beans.property.DoubleProperty;
+
 import java.util.Set;
 
 public interface STBGraph<V extends STBTerminal, E extends STBEdge> extends STBComponent, Cloneable {
@@ -17,4 +19,5 @@ public interface STBGraph<V extends STBTerminal, E extends STBEdge> extends STBC
     boolean removeEdges(Set<E> edges);
 
     double getWeight();
+    DoubleProperty weightProperty();
 }

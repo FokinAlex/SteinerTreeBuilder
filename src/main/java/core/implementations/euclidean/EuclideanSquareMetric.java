@@ -5,11 +5,11 @@ import core.interfaces.STBLocation;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
-public final class EuclideanMetric<Location extends STBLocation, Result extends DoubleProperty> extends AbstractMetric<Location, Result> {
+public final class EuclideanSquareMetric<Location extends STBLocation, Result extends DoubleProperty> extends AbstractMetric<Location, Result> {
 
-    public static final EuclideanMetric METRIC = new EuclideanMetric();
+    public static final EuclideanSquareMetric METRIC = new EuclideanSquareMetric();
 
-    private EuclideanMetric() {}
+    private EuclideanSquareMetric() {}
 
     /**
      * Returns <code>DoubleProperty</code> which contains square (!) of euclidean
@@ -21,8 +21,8 @@ public final class EuclideanMetric<Location extends STBLocation, Result extends 
      */
     @Override
     public Result apply(Location location1, Location location2) {
-        DoubleProperty temp = new SimpleDoubleProperty();
-        temp.bind((location1.getXProperty()
+        DoubleProperty result = new SimpleDoubleProperty();
+        result.bind((location1.getXProperty()
                                 .subtract(location2.getXProperty())
                         .multiply(location1.getXProperty()
                                 .subtract(location2.getXProperty())))
@@ -30,8 +30,6 @@ public final class EuclideanMetric<Location extends STBLocation, Result extends 
                                 .subtract(location2.getYProperty())
                         .multiply(location1.getYProperty()
                                 .subtract(location2.getYProperty())))));
-        DoubleProperty result = new SimpleDoubleProperty(Math.sqrt(temp.get()));
-        temp.addListener((observable, oldValue, newValue) -> result.set(Math.sqrt(temp.get())));
         return (Result) result;
     }
 }
