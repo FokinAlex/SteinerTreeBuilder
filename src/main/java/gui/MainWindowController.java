@@ -5,6 +5,8 @@ import appi.ci.interfaces.Project;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 import utils.DialogUtils;
 
@@ -51,6 +53,13 @@ public class MainWindowController {
     @FXML private Menu steinerHeuristicAlgorithms;
 
     // Panes:
+    @FXML private BorderPane mainPane;
+
+    @FXML private ToolBar toolBar;
+    @FXML private ToggleButton cursorTB;
+    @FXML private ToggleButton addTerminalTB;
+    @FXML private ToggleButton addEdgeTB;
+
     @FXML private AnchorPane projectViewPane;
 
     @FXML private AnchorPane projectPropertiesPane;
@@ -72,7 +81,6 @@ public class MainWindowController {
     @FXML private Label edgeLenghtValue;
     @FXML private Button deleteEdge;
 
-
     // Footer:
     @FXML private Label leftStatus;
     @FXML private Label rightStatus;
@@ -87,7 +95,9 @@ public class MainWindowController {
         this.projectMenu.disableProperty().bind(ProjectController.hasProject().not());
         this.algorithmsMenu.disableProperty().bind(pageMenu.disableProperty());
         this.propertiesText.visibleProperty().bind(ProjectController.hasProject());
+        this.toolBar.visibleProperty().bind(pageMenu.disableProperty().not());
         this.projectTV.visibleProperty().bind(ProjectController.hasProject());
+        this.mainPane.visibleProperty().bind(ProjectController.hasProject());
         SteinerExactAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
             menuItem.setOnAction(event -> this.pagesController.execute(type));
@@ -213,26 +223,35 @@ public class MainWindowController {
     @FXML
     public boolean addTerminalsAction() {
         setLeftStatus("Add terminals action");
-        this.pagesController.setTerminalAdditionModeProperty(this.addTerminalsRMI.isSelected());
-        this.pagesController.setSingleEdgeAdditionModeProperty(false);
+        this.addTerminalTB.setSelected(true);
+        this.addTerminalsRMI.setSelected(true);
+        this.cursorTB.setSelected(false);
+        this.addEdgeTB.setSelected(false);
         this.addEdgesRMI.setSelected(false);
+        this.pagesController.setSingleEdgeAdditionModeProperty(false);
+        this.pagesController.setTerminalAdditionModeProperty(this.addTerminalsRMI.isSelected());
         return true;
     }
 
     @FXML
     public boolean addEdgeAction() {
         setLeftStatus("Add edge action");
-        this.pagesController.setSingleEdgeAdditionModeProperty(true);
+        this.cursorTB.setSelected(false);
+        this.addTerminalTB.setSelected(false);
         this.addTerminalsRMI.setSelected(false);
-        this.addEdgesRMI.setSelected(false);
+        this.pagesController.setSingleEdgeAdditionModeProperty(true);
         return true;
     }
 
     @FXML
     public boolean addEdgesAction() {
         setLeftStatus("Add edges action");
-        this.pagesController.setEdgeAdditionModeProperty(this.addEdgesRMI.isSelected());
+        this.addEdgeTB.setSelected(true);
+        this.addEdgesRMI.setSelected(true);
+        this.cursorTB.setSelected(false);
+        this.addTerminalTB.setSelected(false);
         this.addTerminalsRMI.setSelected(false);
+        this.pagesController.setEdgeAdditionModeProperty(this.addEdgesRMI.isSelected());
         return true;
     }
 
@@ -266,6 +285,18 @@ public class MainWindowController {
     private boolean deleteEdgeAction() {
         setLeftStatus("Delete edge action");
         this.pagesController.getCurrentPageController().deleteSelectedEdge();
+        return true;
+    }
+
+    @FXML
+    private boolean cursorToggleAction() {
+        this.addEdgeTB.setSelected(false);
+        this.addTerminalTB.setSelected(false);
+        this.addTerminalsRMI.setSelected(false);
+        this.addEdgesRMI.setSelected(false);
+        this.pagesController.setEdgeAdditionModeProperty(false);
+        this.pagesController.setSingleEdgeAdditionModeProperty(false);
+        this.pagesController.setTerminalAdditionModeProperty(false);
         return true;
     }
 
