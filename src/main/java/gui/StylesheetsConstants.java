@@ -12,4 +12,6 @@ public class StylesheetsConstants {
     public static final PseudoClass PSEUDO_CLASS_SELECTED = PseudoClass.getPseudoClass("selected");
     public static final PseudoClass PSEUDO_CLASS_FIRSTENDPOINT = PseudoClass.getPseudoClass("firstendpoint");
     public static final PseudoClass PSEUDO_CLASS_SECONDENDPOINT = PseudoClass.getPseudoClass("secondendpoint");
+    public static final PseudoClass PSEUDO_CLASS_SIMPLE_TERMINAL = PseudoClass.getPseudoClass("simple-terminal");
+    public static final PseudoClass PSEUDO_CLASS_STEINER_TERMINAL = PseudoClass.getPseudoClass("steiner-terminal");
 }

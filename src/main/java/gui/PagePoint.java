@@ -4,6 +4,7 @@ import appi.ci.interfaces.ProjectPointView;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.css.PseudoClass;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -11,7 +12,8 @@ import javafx.scene.shape.Rectangle;
 public class PagePoint extends StackPane implements ProjectPointView {
 
     // TODO: replace next 3 lines into configuration
-    public static final double REGULAR_POINT_RADIUS = 10.;
+    public static final double REGULAR_POINT_RADIUS = 8.;
+    public static final double STEINER_POINT_RADIUS = 6.;
     public static final double HALO_BORDER_OFFSET = 4.;
     public static final double HALO_SIZE = REGULAR_POINT_RADIUS * 2 + HALO_BORDER_OFFSET * 2;
 
@@ -34,9 +36,24 @@ public class PagePoint extends StackPane implements ProjectPointView {
         this.getChildren().addAll(this.halo, this.background);
     }
 
+    @Override
+    public void setTerminalType(PseudoClass type) {
+        if (type.equals(StylesheetsConstants.PSEUDO_CLASS_SIMPLE_TERMINAL)) {
+            this.background.setRadius(REGULAR_POINT_RADIUS);
+            this.background.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_STEINER_TERMINAL, false);
+            this.background.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_SIMPLE_TERMINAL, true);
+        }
+        if (type.equals(StylesheetsConstants.PSEUDO_CLASS_STEINER_TERMINAL)) {
+            this.background.setRadius(STEINER_POINT_RADIUS);
+            this.background.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_SIMPLE_TERMINAL, false);
+            this.background.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_STEINER_TERMINAL, true);
+        }
+    }
+
     private void backgroundInit() {
         this.background = new Circle(REGULAR_POINT_RADIUS);
         this.background.getStyleClass().add(StylesheetsConstants.TERMINAL_BACKGROUND);
+        this.setTerminalType(StylesheetsConstants.PSEUDO_CLASS_SIMPLE_TERMINAL);
         this.isSelected.addListener((observable, oldValue, newValue) -> {
             this.halo.visibleProperty().set(newValue);
             this.background.pseudoClassStateChanged(StylesheetsConstants.PSEUDO_CLASS_SELECTED, newValue);

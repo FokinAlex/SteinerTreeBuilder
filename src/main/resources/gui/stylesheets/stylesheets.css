@@ -8,6 +8,13 @@
 	-fx-arc-height: 6;
 }
 
+.terminal-background:simple-terminal {
+}
+
+.terminal-background:steiner-terminal {
+    -fx-opacity: 0.6;
+}
+
 .terminal-background:selected {
 	-fx-opacity: 1;
 }

@@ -15,6 +15,8 @@ public class EuclideanTerminal<Location extends EuclideanLocation> extends Abstr
 
     @Override
     public EuclideanTerminal clone() throws CloneNotSupportedException {
-        return new EuclideanTerminal(this.location.clone(), this.id);
+        EuclideanTerminal clone = new EuclideanTerminal(this.location.clone(), this.id);
+        clone.type.setValue(this.type.getValue());
+        return clone;
     }
 }

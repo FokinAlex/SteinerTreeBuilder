@@ -12,9 +12,12 @@ import core.implementations.euclidean.EuclideanTerminal;
 import core.interfaces.STBAlgorithm;
 import core.interfaces.STBEdge;
 import core.interfaces.STBTerminal;
+import core.types.STBTerminalType;
 import gui.PageEdge;
+import gui.StylesheetsConstants;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
+import javafx.css.PseudoClass;
 import utils.IdUtils;
 import utils.vuu.StringDoubleConverter;
 
@@ -71,10 +74,10 @@ public class GraphPagePaneController {
 
     public void execute(AlgorithmType type, GraphPagePaneController resultController) {
         STBAlgorithm algorithm = type.getInstance(this.page.getGraph());
-        this.algorithmInProgress.bind(algorithm.inProgressProperty());
-        this.algorithmInProgress.addListener((observable, oldValue, newValue) -> {
+        resultController.algorithmInProgress.bind(algorithm.inProgressProperty());
+        resultController.algorithmInProgress.addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
-                this.algorithmInProgress.unbind();
+                resultController.algorithmInProgress.unbind();
                 EuclideanGraph result = (EuclideanGraph) algorithm.getResult();
                 result.getAllVertexes().forEach(vertex -> {
                     resultController.addPoint((STBTerminal) vertex);
@@ -94,7 +97,7 @@ public class GraphPagePaneController {
 
     public ProjectPointView addPoint(STBTerminal terminal) {
         // TODO: check type
-        ProjectPointView pointView = this.pageView.addNewPoint(terminal.getLocation().getXProperty().get(), terminal.getLocation().getYProperty().get());
+        ProjectPointView pointView = this.pageView.addNewPoint(terminal.getLocation().xProperty().get(), terminal.getLocation().yProperty().get());
         pointView.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!terminalAdditionMode.get()) {
                 if ((this.edgeAdditionMode.get() || this.singleEdgeAdditionMode.get()) && this.hasSelectedPoint.get() && newValue)  {
@@ -109,20 +112,28 @@ public class GraphPagePaneController {
                 pointView.unselect();
             }
         });
-        terminal.getLocation().getXProperty().bind(pointView.xPropertyProperty());
-        terminal.getLocation().getYProperty().bind(pointView.yPropertyProperty());
+        terminal.getLocation().xProperty().bind(pointView.xPropertyProperty());
+        terminal.getLocation().yProperty().bind(pointView.yPropertyProperty());
+        pointView.setTerminalType(
+                terminal.typeProperty().getValue().equals(STBTerminalType.SIMPLE_TERMINAL) ?
+                        StylesheetsConstants.PSEUDO_CLASS_SIMPLE_TERMINAL :
+                        StylesheetsConstants.PSEUDO_CLASS_STEINER_TERMINAL);
+        terminal.typeProperty().addListener((observable, oldValue, newValue) -> pointView.setTerminalType(
+                    newValue.equals(STBTerminalType.SIMPLE_TERMINAL) ?
+                    StylesheetsConstants.PSEUDO_CLASS_SIMPLE_TERMINAL :
+                    StylesheetsConstants.PSEUDO_CLASS_STEINER_TERMINAL));
 //        TODO: if something must change in real time
 //        algorithmInProgress.addListener((observable, oldValue, newValue) -> {
 //            if (newValue) {
-//                terminal.getLocation().getXProperty().unbind();
-//                terminal.getLocation().getYProperty().unbind();
-//                pointView.xPropertyProperty().bind(this.terminal.getLocation().getXProperty());
-//                pointView.yPropertyProperty().bind(this.terminal.getLocation().getYProperty());
+//                terminal.getLocation().xProperty().unbind();
+//                terminal.getLocation().yProperty().unbind();
+//                pointView.xPropertyProperty().bind(this.terminal.getLocation().xProperty());
+//                pointView.yPropertyProperty().bind(this.terminal.getLocation().yProperty());
 //            } else {
 //                pointView.xPropertyProperty().unbind();
 //                pointView.yPropertyProperty().unbind();
-//                terminal.getLocation().getXProperty().bind(pointView.xPropertyProperty());
-//                terminal.getLocation().getYProperty().bind(pointView.yPropertyProperty());
+//                terminal.getLocation().xProperty().bind(pointView.xPropertyProperty());
+//                terminal.getLocation().yProperty().bind(pointView.yPropertyProperty());
 //            }
 //        });
         this.points.put(pointView, terminal);
@@ -147,8 +158,8 @@ public class GraphPagePaneController {
             }
         }
         STBTerminal terminal = this.points.get(this.selectedPoint);
-        terminal.getLocation().getXProperty().unbind();
-        terminal.getLocation().getYProperty().unbind();
+        terminal.getLocation().xProperty().unbind();
+        terminal.getLocation().yProperty().unbind();
         this.pageView.removePoint(this.selectedPoint);
         this.points.remove(this.selectedPoint);
         this.selectedPoint.delete();

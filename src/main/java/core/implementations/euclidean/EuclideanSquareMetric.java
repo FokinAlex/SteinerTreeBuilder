@@ -22,14 +22,14 @@ public final class EuclideanSquareMetric<Location extends STBLocation, Result ex
     @Override
     public Result apply(Location location1, Location location2) {
         DoubleProperty result = new SimpleDoubleProperty();
-        result.bind((location1.getXProperty()
-                                .subtract(location2.getXProperty())
-                        .multiply(location1.getXProperty()
-                                .subtract(location2.getXProperty())))
-                .add((location1.getYProperty()
-                                .subtract(location2.getYProperty())
-                        .multiply(location1.getYProperty()
-                                .subtract(location2.getYProperty())))));
+        result.bind((location1.xProperty()
+                                .subtract(location2.xProperty())
+                        .multiply(location1.xProperty()
+                                .subtract(location2.xProperty())))
+                .add((location1.yProperty()
+                                .subtract(location2.yProperty())
+                        .multiply(location1.yProperty()
+                                .subtract(location2.yProperty())))));
         return (Result) result;
     }
 }
