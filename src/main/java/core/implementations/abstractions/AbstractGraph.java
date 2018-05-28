@@ -6,6 +6,7 @@ import core.interfaces.STBTerminal;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,17 +33,26 @@ public abstract class AbstractGraph<Terminal extends STBTerminal, Edge extends S
 
     @Override
     public boolean removeVertex(Terminal vertex) {
-        this.edges.forEach(edge -> {
-            if (edge.getFirstEndpoint().equals(vertex) || edge.getSecondEndpoint().equals(vertex)) this.removeEdge(edge);
-        });
+        Iterator<Edge> iterator = this.edges.iterator();
+        while (iterator.hasNext()) {
+            Edge edge = iterator.next();
+            if (edge.getFirstEndpoint().equals(vertex) || edge.getSecondEndpoint().equals(vertex)) iterator.remove();
+        }
         return this.vertexes.remove(vertex);
     }
 
     @Override
     public boolean removeVertexes(Set<Terminal> vertexes) {
-        this.vertexes.forEach(vertex -> this.edges.forEach(edge -> {
-            if (edge.getFirstEndpoint().equals(vertex) || edge.getSecondEndpoint().equals(vertex)) this.removeEdge(edge);
-        }));
+        this.vertexes.forEach(vertex -> {
+            Iterator<Edge> iterator = this.edges.iterator();
+            while (iterator.hasNext()) {
+                Edge edge = iterator.next();
+                if (edge.getFirstEndpoint().equals(vertex) || edge.getSecondEndpoint().equals(vertex)) {
+                    this.weightProperty.set(this.weightProperty.get() - edge.getLength());
+                    iterator.remove();
+                }
+            }
+        });
         return this.vertexes.removeAll(vertexes);
     }
 
