@@ -107,6 +107,11 @@ public class MainWindowController {
             menuItem.setOnAction(event -> this.projectViewController.execute(type));
             this.steinerHeuristicAlgorithms.getItems().add(menuItem);
         });
+        OtherAlgorithms.ALGORITHMS.forEach((name, type) -> {
+            MenuItem menuItem = new MenuItem(name);
+            menuItem.setOnAction(event -> this.projectViewController.execute(type));
+            this.algorithmsMenu.getItems().add(menuItem);
+        });
     }
 
     @FXML
