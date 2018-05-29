@@ -30,6 +30,11 @@ public enum SteinerHeuristicAlgorithms implements STBHeuristicAlgorithm, Algorit
         }
 
         @Override
+        public String fullName() {
+            return "Incremental Optimization Algorithm";
+        }
+
+        @Override
         public void run() {
             this.algorithm.run();
         }
@@ -61,6 +66,11 @@ public enum SteinerHeuristicAlgorithms implements STBHeuristicAlgorithm, Algorit
         }
 
         @Override
+        public String fullName() {
+            return "Gravitational Algorithm";
+        }
+
+        @Override
         public void run() {
             this.algorithm.run();
         }
@@ -88,6 +98,11 @@ public enum SteinerHeuristicAlgorithms implements STBHeuristicAlgorithm, Algorit
         @Override
         public String shortName() {
             return "SLL";
+        }
+
+        @Override
+        public String fullName() {
+            return "Smith-Lee-Liebman Algorithm";
         }
 
         @Override

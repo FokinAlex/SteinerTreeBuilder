@@ -6,6 +6,8 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import utils.vuu.StringDoubleConverter;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 public final class DialogUtils {
@@ -64,5 +66,26 @@ public final class DialogUtils {
 
         Optional<String> optional = dialog.showAndWait();
         return optional.isPresent() ? optional.get() : null;
+    }
+
+    public static void showResultsDialog(Map<String, String> values) {
+        Dialog<String> dialog = new Dialog();
+        dialog.setTitle("Results");
+        GridPane pane = new GridPane();
+        pane.setHgap(10);
+        pane.setVgap(10);
+        pane.setPadding(new Insets(10, 10, 10, 10));
+
+        Iterator<Map.Entry<String, String>> iterator = values.entrySet().iterator();
+        int i = 0;
+        while (iterator.hasNext()) {
+            Map.Entry entry = iterator.next();
+            pane.add(new Label((String) entry.getKey()), 0, i);
+            pane.add(new Label((String) entry.getValue()), 1, i++);
+        }
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY);
+        dialog.getDialogPane().setContent(pane);
+
+        dialog.showAndWait();
     }
 }

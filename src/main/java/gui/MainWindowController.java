@@ -8,6 +8,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 import utils.DialogUtils;
+import utils.iou.FileChooserUtils;
 
 public class MainWindowController {
 
@@ -45,6 +46,7 @@ public class MainWindowController {
     @FXML private MenuItem renamePageMI;
     @FXML private MenuItem closePageMI;
     @FXML private MenuItem removePageMI;
+    @FXML private Menu resultPageMenu;
 
     // "Algorithms" menu:
     @FXML private Menu algorithmsMenu;
@@ -279,6 +281,25 @@ public class MainWindowController {
     }
 
     @FXML
+    public boolean showResultsAction() {
+        setLeftStatus("Show result action");
+        DialogUtils.showResultsDialog(this.projectViewController.getResults());
+        return true;
+    }
+
+    @FXML
+    public boolean importORLTasksAction() {
+        setLeftStatus("Import ORL tasks action");
+        return this.projectViewController.importORLTask(FileChooserUtils.getORLibraryFileChooser(ProjectController.getDirectory()).showOpenDialog(null));
+    }
+
+    @FXML
+    public boolean importORLResultsAction() {
+        setLeftStatus("Import ORL results action");
+        return this.projectViewController.importORLResult(FileChooserUtils.getORLibraryFileChooser(ProjectController.getDirectory()).showOpenDialog(null));
+    }
+
+    @FXML
     private boolean deleteTerminalAction() {
         setLeftStatus("Delete terminal action");
         this.projectViewController.getCurrentPageController().deleteSelectedPoint();
@@ -318,6 +339,7 @@ public class MainWindowController {
         this.terminalPropertiesPane.visibleProperty().bind(this.projectViewController.selectedPointProperty());
         this.edgePropertiesPane.visibleProperty().bind(this.projectViewController.selectedEdgeProperty());
         this.projectViewController.setHasCurrentPagePropertyFollower(this.pageMenu.disableProperty());
+        this.projectViewController.setIsResultPagePropertyFollower(this.resultPageMenu.disableProperty());
         this.projectViewController.setSelectedPointXPropertyFollower(this.terminalXValue.textProperty());
         this.projectViewController.setSelectedPointYPropertyFollower(this.terminalYValue.textProperty());
         this.projectViewController.setFirstPointXPropertyFollower(this.edgeFirstEndpointXValue.textProperty());

@@ -108,6 +108,10 @@ public enum ProjectController {
         if (name != null && !name.isEmpty()) project.getValue().nameProperty().set(name);
     }
 
+    public static File getDirectory() {
+        return project.getValue().getFile();
+    }
+
     public static String getProjectName() {
         return project.getValue().nameProperty().get();
     }

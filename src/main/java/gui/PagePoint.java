@@ -12,8 +12,8 @@ import javafx.scene.shape.Rectangle;
 public class PagePoint extends StackPane implements ProjectPointView {
 
     // TODO: replace next 3 lines into configuration
-    public static final double REGULAR_POINT_RADIUS = 8.;
-    public static final double STEINER_POINT_RADIUS = 6.;
+    public static final double REGULAR_POINT_RADIUS = 6.;
+    public static final double STEINER_POINT_RADIUS = 4.;
     public static final double HALO_BORDER_OFFSET = 4.;
     public static final double HALO_SIZE = REGULAR_POINT_RADIUS * 2 + HALO_BORDER_OFFSET * 2;
 

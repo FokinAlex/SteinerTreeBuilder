@@ -7,14 +7,18 @@ import java.io.File;
 
 public final class FileChooserUtils {
 
-    private static final FileChooser FILE_CHOOSER = new FileChooser();
+    private static final FileChooser PROJECT_FILE_CHOOSER = new FileChooser();
+    private static final FileChooser ORL_FILE_CHOOSER = new FileChooser();
     private static final DirectoryChooser DIRECTORY_CHOOSER = new DirectoryChooser();
     private static final FileChooser.ExtensionFilter STB_FILTER = new FileChooser.ExtensionFilter("STB-Project files (*.stb)", "*.stb");
     private static final FileChooser.ExtensionFilter JSON_FILTER = new FileChooser.ExtensionFilter("Json files (*.json)", "*.json");
+    private static final FileChooser.ExtensionFilter TXT_FILTER = new FileChooser.ExtensionFilter("Text files (*.txt)", "*.txt");
 
     static {
-        FILE_CHOOSER.getExtensionFilters().addAll(STB_FILTER, JSON_FILTER);
-        FILE_CHOOSER.setTitle("Chooser project file");
+        PROJECT_FILE_CHOOSER.getExtensionFilters().addAll(STB_FILTER, JSON_FILTER);
+        PROJECT_FILE_CHOOSER.setTitle("Chooser project file");
+        ORL_FILE_CHOOSER.getExtensionFilters().add(TXT_FILTER);
+        ORL_FILE_CHOOSER.setTitle("Choose OR-Library file");
         DIRECTORY_CHOOSER.setTitle("Choose project directory");
     }
 
@@ -24,7 +28,12 @@ public final class FileChooserUtils {
     }
 
     public static FileChooser getProjectFileChooser(File initialDirectory) {
-        FILE_CHOOSER.setInitialDirectory(initialDirectory);
-        return FILE_CHOOSER;
+        PROJECT_FILE_CHOOSER.setInitialDirectory(initialDirectory);
+        return PROJECT_FILE_CHOOSER;
+    }
+
+    public static FileChooser getORLibraryFileChooser(File initialDirectory) {
+        ORL_FILE_CHOOSER.setInitialDirectory(initialDirectory);
+        return ORL_FILE_CHOOSER;
     }
 }
