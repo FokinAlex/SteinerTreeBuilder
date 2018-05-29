@@ -24,7 +24,12 @@ public enum OtherAlgorithms implements STBAlgorithm, AlgorithmType {
 
         @Override
         public String shortName() {
-            return "Kruskall";
+            return "MST";
+        }
+
+        @Override
+        public String fullName() {
+            return "Kruskall MST Algorithm";
         }
 
         @Override
@@ -56,6 +61,11 @@ public enum OtherAlgorithms implements STBAlgorithm, AlgorithmType {
         @Override
         public String shortName() {
             return "Triangulation";
+        }
+
+        @Override
+        public String fullName() {
+            return "Delaunay Triangulation Algorithm";
         }
 
         @Override

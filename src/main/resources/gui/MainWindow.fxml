@@ -33,10 +33,14 @@
             <MenuItem fx:id="newProjectMI" mnemonicParsing="false" onAction="#newProjectAction" text="New" />
             <MenuItem fx:id="openProjectMI" mnemonicParsing="false" onAction="#openProjectAction" text="Open" />
             <MenuItem fx:id="closeProjectMI" mnemonicParsing="false" onAction="#closeProjectAction" text="Close" />
-            <MenuItem fx:id="saveProjectMI" mnemonicParsing="false" onAction="#saveProjectAction" text="Save" />
+                  <Menu mnemonicParsing="false" text="Save As ...">
+                    <items>
+                  <MenuItem fx:id="saveProjectMI" mnemonicParsing="false" onAction="#saveProjectAction" text="Project (.stb)" />
+                    </items>
+                  </Menu>
           </items>
         </Menu>
-        <Menu fx:id="editMenu" disable="true" mnemonicParsing="false" text="Edit">
+        <Menu fx:id="editMenu" disable="true" mnemonicParsing="false" text="Edit" visible="false">
           <items>
             <MenuItem fx:id="undoMI" mnemonicParsing="false" onAction="#undoAction" text="Undo" />
             <MenuItem fx:id="redoMI" mnemonicParsing="false" onAction="#redoAction" text="Redo" />
@@ -52,6 +56,12 @@
             <Menu fx:id="projectMenu" disable="true" mnemonicParsing="false" text="Project">
               <items>
                 <MenuItem fx:id="addPageMI" mnemonicParsing="false" onAction="#addPageAction" text="Add new Page" />
+                  <Menu mnemonicParsing="false" text="Import">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#importORLTasksAction" text="OR-Library Tasks" />
+                        <MenuItem mnemonicParsing="false" onAction="#importORLResultsAction" text="OR-Library Results" />
+                    </items>
+                  </Menu>
                   <MenuItem fx:id="renameProjectMI" mnemonicParsing="false" onAction="#renameProjectAction" text="Rename Project" />
                   <MenuItem fx:id="projectPropertiesMI" disable="true" mnemonicParsing="false" onAction="#showProjectPropertiesPageAction" text="Properties" />
               </items>
@@ -66,6 +76,17 @@
                   <MenuItem fx:id="renamePageMI" mnemonicParsing="false" onAction="#renamePageAction" text="Rename Page" />
                   <MenuItem fx:id="closePageMI" mnemonicParsing="false" onAction="#closePageAction" text="Close Page" />
                   <MenuItem fx:id="removePageMI" mnemonicParsing="false" onAction="#removePageAction" text="Remove Page" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <Menu fx:id="resultPageMenu" disable="true" mnemonicParsing="false" text="Result Page">
+                    <items>
+                        <Menu mnemonicParsing="false" text="Save As...">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="New Project" visible="false" />
+                          </items>
+                        </Menu>
+                      <MenuItem mnemonicParsing="false" onAction="#showResultsAction" text="Show Result" />
+                    </items>
+                  </Menu>
           </items>
         </Menu>
             <Menu fx:id="algorithmsMenu" disable="true" mnemonicParsing="false" text="Algorithms">
@@ -119,7 +140,7 @@
         <AnchorPane fx:id="projectPropertiesPane" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" BorderPane.alignment="CENTER">
                <children>
                   <TreeView fx:id="projectTV" layoutX="10.0" maxHeight="150.0" maxWidth="200.0" minHeight="150.0" minWidth="200.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                  <Label fx:id="graphWeight" layoutX="78.0" layoutY="17.0" text="Weight:" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="165.0" />
+                  <Label fx:id="graphWeight" layoutX="78.0" layoutY="17.0" text="Weight:" visible="false" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="165.0" />
                   <ScrollPane fx:id="terminalPropertiesPane" maxWidth="200.0" minWidth="200.0" prefHeight="504.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="185.0">
                      <content>
                         <AnchorPane maxWidth="208.0" minWidth="208.0" prefWidth="205.0">
@@ -135,7 +156,7 @@
                         </AnchorPane>
                      </content>
                   </ScrollPane>
-                  <ScrollPane fx:id="edgePropertiesPane" layoutX="10.0" layoutY="10.0" maxWidth="200.0" minWidth="200.0" prefHeight="504.0" prefWidth="200.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="185.0">
+                  <ScrollPane fx:id="edgePropertiesPane" layoutX="10.0" layoutY="10.0" maxWidth="200.0" minWidth="200.0" prefHeight="504.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="185.0">
                      <content>
                         <AnchorPane maxWidth="208.0" minWidth="208.0" prefWidth="208.0">
                            <children>

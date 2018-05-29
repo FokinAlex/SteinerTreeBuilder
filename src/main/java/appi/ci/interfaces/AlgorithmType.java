@@ -7,4 +7,5 @@ public interface AlgorithmType {
 
     STBAlgorithm getInstance(STBComponent argument);
     String shortName();
+    String fullName();
 }

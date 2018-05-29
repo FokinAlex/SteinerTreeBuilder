@@ -5,6 +5,7 @@ import appi.ci.interfaces.ProjectEdgeView;
 import appi.ci.interfaces.ProjectPageView;
 import appi.ci.interfaces.ProjectPointView;
 import core.implementations.GraphPage;
+import core.implementations.ResultGraphPage;
 import core.implementations.euclidean.EuclideanEdge;
 import core.implementations.euclidean.EuclideanGraph;
 import core.implementations.euclidean.EuclideanLocation;
@@ -17,7 +18,6 @@ import gui.PageEdge;
 import gui.StylesheetsConstants;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
-import javafx.css.PseudoClass;
 import utils.IdUtils;
 import utils.vuu.StringDoubleConverter;
 
@@ -33,6 +33,7 @@ public class GraphPagePaneController {
     private ProjectPointView selectedPoint;
     private ProjectEdgeView selectedEdge;
 
+    private boolean isResultPage = false;
     private ProjectPageView pageView;
     private GraphPage page;
 
@@ -65,6 +66,7 @@ public class GraphPagePaneController {
         this.page = page;
         this.points = new HashMap<>();
         this.edges = new HashMap<>();
+        this.isResultPage = page instanceof ResultGraphPage;
         this.graphInit();
     }
 
@@ -72,11 +74,15 @@ public class GraphPagePaneController {
         return this.page;
     }
 
-    public void execute(AlgorithmType type, GraphPagePaneController resultController) {
+    public void execute(AlgorithmType type, GraphPagePaneController resultController, String algorithmName) {
         STBAlgorithm algorithm = type.getInstance(this.page.getGraph());
         resultController.algorithmInProgress.bind(algorithm.inProgressProperty());
+        long time = System.nanoTime();
         resultController.algorithmInProgress.addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
+                if (this.isResultPage) ((ResultGraphPage) resultController.page).putProperties(((ResultGraphPage) this.page).getProperties());
+                ((ResultGraphPage) resultController.page).putProperty("nanotime", String.valueOf(System.nanoTime() - time));
+                ((ResultGraphPage) resultController.page).putProperty("algorithm", algorithmName);
                 resultController.algorithmInProgress.unbind();
                 EuclideanGraph result = (EuclideanGraph) algorithm.getResult();
                 result.getAllVertexes().forEach(vertex -> {

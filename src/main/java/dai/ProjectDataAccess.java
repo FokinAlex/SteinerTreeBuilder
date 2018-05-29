@@ -5,13 +5,16 @@ import appi.ci.interfaces.Project;
 import core.exceptions.IllegalComponentException;
 import core.implementations.GraphMultiPageScheme;
 import core.implementations.GraphPage;
+import core.implementations.ResultGraphPage;
 import core.interfaces.STBGraph;
 import core.interfaces.STBPage;
 import core.interfaces.STBScheme;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public enum ProjectDataAccess {
     SIMPLE {
@@ -28,9 +31,12 @@ public enum ProjectDataAccess {
                 JSONObject jPage = new JSONObject();
                 JSONObject jPagesValues = new JSONObject();
                 jPagesValues.put("name", ((STBPage) page).nameProperty().get());
-                // TODO: check type
+                // TODO: check if not GraphPage
                 jPagesValues.put("graph", GraphDataAccess.EUCLIDEAN.toJson((STBGraph) ((STBPage) page).getAllComponents().get(0)));
-                jPage.put("page", jPagesValues);
+                if (page instanceof ResultGraphPage) {
+                    ((ResultGraphPage) page).getProperties().forEach((name, property) -> jPagesValues.put(name, property));
+                    jPage.put("resultpage", jPagesValues);
+                } else jPage.put("page", jPagesValues);
                 jPages.add(jPage);
             });
             return root;
@@ -46,11 +52,25 @@ public enum ProjectDataAccess {
             JSONArray jPages = (JSONArray) jProject.get("pages");
             Iterator<JSONObject> iterator = jPages.iterator();
             while (iterator.hasNext()) {
-                JSONObject jPage = (JSONObject) iterator.next().get("page");
+                JSONObject jPageObject = iterator.next();
+                JSONObject jPage = (JSONObject) jPageObject.get("page");
+                if (null == jPage) {
+                    jPage = (JSONObject) jPageObject.get("resultpage");
+                    // TODO: check type
+                    STBGraph pageGraph = GraphDataAccess.EUCLIDEAN.fromJson(jPage);
+                    currentPage = new ResultGraphPage(pageGraph);
+                    Map<String, String> properties = new HashMap<>();
+                    jPage.forEach((name, property) -> {
+                        if (name instanceof String && property instanceof String)
+                            properties.put((String) name, (String) property);
+                    });
+                    ((ResultGraphPage) currentPage).putProperties(properties);
+                } else {
+                    // TODO: check type
+                    STBGraph pageGraph = GraphDataAccess.EUCLIDEAN.fromJson(jPage);
+                    currentPage = new GraphPage(pageGraph);
+                }
                 String pageName = (String) jPage.get("name");
-                // TODO: check type
-                STBGraph pageGraph = GraphDataAccess.EUCLIDEAN.fromJson((JSONObject) jPage);
-                currentPage = new GraphPage(pageGraph);
                 currentPage.nameProperty().set(pageName);
                 scheme.addPage(currentPage);
             }

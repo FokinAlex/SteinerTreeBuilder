@@ -33,6 +33,11 @@ public enum SteinerExactAlgorithms implements STBExactAlgorithm, AlgorithmType {
         public String shortName() {
             return null;
         }
+
+        @Override
+        public String fullName() {
+            return null;
+        }
     };
 
     public static Map<String, SteinerExactAlgorithms> ALGORITHMS = new HashMap<String, SteinerExactAlgorithms>() {{

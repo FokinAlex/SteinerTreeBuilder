@@ -4,7 +4,9 @@ import appi.ci.interfaces.AlgorithmType;
 import appi.ci.interfaces.Project;
 import core.exceptions.IllegalComponentException;
 import core.implementations.GraphPage;
+import core.implementations.ResultGraphPage;
 import core.implementations.euclidean.EuclideanGraph;
+import dai.ORLibraryAccess;
 import gui.PagePane;
 import gui.PagePoint;
 import javafx.beans.property.*;
@@ -17,6 +19,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +37,7 @@ public class ProjectViewController extends TabPane {
     private BooleanProperty edgeAdditionModeProperty = new SimpleBooleanProperty();
     private BooleanProperty singleEdgeAdditionModeProperty = new SimpleBooleanProperty();
     private BooleanProperty hasntCurrentPage;
+    private BooleanProperty isntResultPage;
 
     private StringProperty selectedPointXProperty;
     private StringProperty selectedPointYProperty;
@@ -45,7 +49,7 @@ public class ProjectViewController extends TabPane {
     private StringProperty edgeLengthStringProperty;
     private StringProperty graphWeightStringProperty;
 
-    private ChangeListener<Number> edgeLengthListener = (observable, oldValue, newValue) -> edgeLengthStringProperty.set("Length: " + ((Math.round((Double) newValue * 100_000) / 100_000.)));
+    private ChangeListener<Number> edgeLengthListener = (observable, oldValue, newValue) -> edgeLengthStringProperty.set("Length: " + newValue);
     private ChangeListener<Number> graphWeightListener = (observable, oldValue, newValue) -> graphWeightStringProperty.set("Weight: " + newValue);
 
     private ProjectTreeViewController projectTreeViewController;
@@ -77,8 +81,8 @@ public class ProjectViewController extends TabPane {
     }
 
     public void execute(AlgorithmType type) {
-        Tab tab = this.addNewGraphPage(this.currentPageController.getValue().getPage().nameProperty().get() + " " + type.shortName() + " result" );
-        this.currentPageController.getValue().execute(type, this.tabs.get(tab));
+        Tab tab = this.addNewResultPage(this.currentPageController.getValue().getPage().nameProperty().get() + " | " + type.shortName());
+        this.currentPageController.getValue().execute(type, this.tabs.get(tab), type.fullName());
         this.getSelectionModel().select(tab);
     }
 
@@ -106,9 +110,20 @@ public class ProjectViewController extends TabPane {
         }
     }
 
+    public Tab addNewResultPage(String name) {
+        try {
+            ResultGraphPage page = new ResultGraphPage(new EuclideanGraph());
+            if (name != null && !name.isEmpty()) page.nameProperty().set(name);
+            this.project.addPage(page);
+            return this.addNewGraphPage(page);
+        } catch (IllegalComponentException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public Tab addNewGraphPage(String name) {
         try {
-            //TODO: ask type
             GraphPage page = new GraphPage(new EuclideanGraph());
             if (name != null && !name.isEmpty()) page.nameProperty().set(name);
             this.project.addPage(page);
@@ -131,7 +146,7 @@ public class ProjectViewController extends TabPane {
         pageController.setSecondPointXPropertyFollower(this.secondPointXProperty);
         pageController.setSecondPointYPropertyFollower(this.secondPointYProperty);
         Tab tab = new Tab(page.nameProperty().get());
-        tab.setOnClosed(event -> this._closeTab(tab)); //this.projectTreeViewController.closeItem(page));
+        tab.setOnClosed(event -> this._closeTab(tab));
         ScrollPane wrap = new ScrollPane();
         wrap.setOnMouseClicked(event -> {
             if (this.terminalAddtionModeProperty.get())
@@ -171,6 +186,41 @@ public class ProjectViewController extends TabPane {
             return true;
         }
         return false;
+    }
+
+    public Map<String, String> getResults() {
+        Map result = null;
+        if (currentPageController.getValue().getPage() instanceof ResultGraphPage)
+            result = ((ResultGraphPage) currentPageController.getValue().getPage()).getProperties();
+        return result;
+    }
+
+    public boolean importORLTask(File file) {
+        try {
+            Map<Integer, GraphPage> pages =  ORLibraryAccess.getTasks(file);
+            pages.forEach((id, page) -> {
+                this.addNewGraphPage(page);
+                this.project.addPage(page);
+            });
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean importORLResult(File file) {
+        try {
+            Map<Integer, ResultGraphPage> pages = ORLibraryAccess.getResults(file);
+            pages.forEach((id, page) -> {
+                this.addNewGraphPage(page);
+                this.project.addPage(page);
+            });
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public GraphPagePaneController getCurrentPageController() {
@@ -243,6 +293,11 @@ public class ProjectViewController extends TabPane {
         this.hasntCurrentPage = property;
         this.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> this.hasntCurrentPage.set(newValue == null));
         if (this.getSelectionModel().getSelectedItem() != null) this.hasntCurrentPage.set(false);
+    }
+
+    public void setIsResultPagePropertyFollower(BooleanProperty property) {
+        this.isntResultPage = property;
+        this.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> this.isntResultPage.set(!(tabs.get(newValue).getPage() instanceof ResultGraphPage)));
     }
 
     public void setGraphWeightPropertyFollower(StringProperty property) {
