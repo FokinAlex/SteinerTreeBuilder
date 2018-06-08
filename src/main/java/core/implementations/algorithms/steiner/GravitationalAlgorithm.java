@@ -36,7 +36,7 @@ public class GravitationalAlgorithm<Graph extends EuclideanGraph, Result extends
 
         Map<Triad<EuclideanTerminal>, EuclideanTerminal> triangles = this.buildTriangulation();
 
-        if (null == triangles || triangles.size() < 1) {
+        if (null == triangles || triangles.size() < 2) {
             this.buildMST();
             inProgress.set(false);
             return;
@@ -80,6 +80,44 @@ public class GravitationalAlgorithm<Graph extends EuclideanGraph, Result extends
             this.result.removeVertexes(excess);
             this.buildMST();
         }
+
+
+        List<EuclideanTerminal> steinerPoints = new ArrayList<>();
+        this.result.getAllVertexes().forEach(terminal -> {
+            if (((EuclideanTerminal) terminal).typeProperty().getValue().equals(STBTerminalType.STEINER_TERMINAL)) {
+                steinerPoints.add((EuclideanTerminal) terminal);
+                ((EuclideanTerminal) terminal).typeProperty().setValue(STBTerminalType.SIMPLE_TERMINAL);
+            }
+        });
+
+        IncrementalOptimizationAlgorithm IOA = new IncrementalOptimizationAlgorithm(this.result);
+        IOA.run();
+        this.result = (Result) IOA.getResult();
+        this.result.getAllVertexes().forEach(terminal -> steinerPoints.forEach(steinerPoint -> {
+            if (((EuclideanTerminal) terminal).getId() == steinerPoint.getId())
+                ((EuclideanTerminal) terminal).typeProperty().setValue(STBTerminalType.STEINER_TERMINAL);
+        }));
+
+        this.buildMST();
+
+        hasExcess = true;
+        while (hasExcess) {
+            Set<EuclideanTerminal> excess = new HashSet<>();
+            this.result.getAllVertexes().forEach(terminal -> {
+                if (((STBTerminal) terminal).typeProperty().getValue().equals(STBTerminalType.STEINER_TERMINAL)) {
+                    final int[] counter = {0};
+                    this.result.getAllEdges().forEach(edge -> {
+                        if (((STBEdge) edge).getFirstEndpoint().equals(terminal) || ((STBEdge) edge).getSecondEndpoint().equals(terminal))
+                            counter[0]++;
+                    });
+                    if (counter[0] < 3 || counter[0] > 4) excess.add((EuclideanTerminal) terminal);
+                }
+            });
+            hasExcess = !excess.isEmpty();
+            this.result.removeVertexes(excess);
+            this.buildMST();
+        }
+
         this.inProgress.set(false);
     }
 

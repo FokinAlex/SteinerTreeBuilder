@@ -8,7 +8,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 import utils.DialogUtils;
-import utils.iou.FileChooserUtils;
+import utils.FileChooserUtils;
+import utils.vuu.StringDoubleConverter;
 
 public class MainWindowController {
 
@@ -99,6 +100,12 @@ public class MainWindowController {
         this.toolBar.visibleProperty().bind(pageMenu.disableProperty().not());
         this.projectTV.visibleProperty().bind(ProjectController.hasProject());
         this.mainPane.visibleProperty().bind(ProjectController.hasProject());
+        terminalXValue.setTextFormatter(new TextFormatter<>(StringDoubleConverter.CONVERTER, .0, StringDoubleConverter.POSITIVE_FILTER));
+        terminalYValue.setTextFormatter(new TextFormatter<>(StringDoubleConverter.CONVERTER, .0, StringDoubleConverter.POSITIVE_FILTER));
+        edgeFirstEndpointXValue.setTextFormatter(new TextFormatter<>(StringDoubleConverter.CONVERTER, .0, StringDoubleConverter.POSITIVE_FILTER));
+        edgeFirstEndpointYValue.setTextFormatter(new TextFormatter<>(StringDoubleConverter.CONVERTER, .0, StringDoubleConverter.POSITIVE_FILTER));
+        edgeSecondEndpointXValue.setTextFormatter(new TextFormatter<>(StringDoubleConverter.CONVERTER, .0, StringDoubleConverter.POSITIVE_FILTER));
+        edgeSecondEndpointYValue.setTextFormatter(new TextFormatter<>(StringDoubleConverter.CONVERTER, .0, StringDoubleConverter.POSITIVE_FILTER));
         SteinerExactAlgorithms.ALGORITHMS.forEach((name, type) -> {
             MenuItem menuItem = new MenuItem(name);
             menuItem.setOnAction(event -> this.projectViewController.execute(type));
@@ -120,17 +127,21 @@ public class MainWindowController {
     public boolean newProjectAction() {
         setLeftStatus("New project action");
         // TODO: user must choose project type
-        uploadProjectWorkspace(ProjectController.getNewProject(ProjectController.SIMPLE_PROJECT));
-        setBindings();
-        return true;
+        if (uploadProjectWorkspace(ProjectController.getNewProject(ProjectController.SIMPLE_PROJECT))) {
+            setBindings();
+            return true;
+        }
+        return false;
     }
 
     @FXML
     public boolean openProjectAction() {
         setLeftStatus("Open project action");
-        uploadProjectWorkspace(ProjectController.openProject());
-        setBindings();
-        return true;
+        if (uploadProjectWorkspace(ProjectController.openProject())) {
+            setBindings();
+            return true;
+        }
+        return false;
     }
 
     @FXML
@@ -322,6 +333,20 @@ public class MainWindowController {
         this.projectViewController.setEdgeAdditionModeProperty(false);
         this.projectViewController.setSingleEdgeAdditionModeProperty(false);
         this.projectViewController.setTerminalAdditionModeProperty(false);
+        return true;
+    }
+
+    @FXML
+    private boolean startAnalAction() {
+        this.projectViewController.startAnal(SteinerHeuristicAlgorithms.REDUCTIONAL_ALGORITHM, 1);
+        this.projectViewController.startAnal(SteinerHeuristicAlgorithms.GRAVITATIONAL_ALGORITHM, 1);
+        this.projectViewController.startAnal(SteinerHeuristicAlgorithms.INCREMENTAL_OPTIMIZATION_ALGORITHM, 1);
+        return true;
+    }
+
+    @FXML
+    public boolean savePageAsReportAction() {
+        this.projectViewController.savePageAsReport();
         return true;
     }
 

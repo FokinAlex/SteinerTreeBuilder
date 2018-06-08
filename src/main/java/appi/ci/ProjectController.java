@@ -14,7 +14,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.json.simple.parser.ParseException;
 import utils.DialogUtils;
-import utils.iou.FileChooserUtils;
+import utils.FileChooserUtils;
 import utils.iou.JsonUtils;
 
 import java.io.File;
@@ -35,7 +35,7 @@ public enum ProjectController {
     public static Project getNewProject(ProjectController type) {
         ProjectController.closeProject();
         String name = DialogUtils.showNameDialog("");
-        // TODO: check if name.isEmpty()
+        if (null == name || name.isEmpty()) return null;
         switch (type) {
             case SIMPLE_PROJECT:
                 GraphMultiPageScheme scheme = new GraphMultiPageScheme();

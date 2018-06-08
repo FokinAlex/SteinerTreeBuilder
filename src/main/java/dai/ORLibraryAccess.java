@@ -3,6 +3,7 @@ package dai;
 import core.exceptions.IllegalComponentException;
 import core.implementations.GraphPage;
 import core.implementations.ResultGraphPage;
+import core.implementations.algorithms.other.KruskallAlgorithm;
 import core.implementations.euclidean.EuclideanGraph;
 import core.implementations.euclidean.EuclideanTerminal;
 import core.types.STBTerminalType;
@@ -49,16 +50,18 @@ public final class ORLibraryAccess {
         results.forEach(result -> {
             try {
                 GraphPage taskPage = tasks.get(result.id);
-                ResultGraphPage page = new ResultGraphPage(taskPage.getGraph());
+                result.getPoints().forEach(point -> {
+                    EuclideanTerminal steinerPoint = new EuclideanTerminal(point, IdUtils.getTerminalId(taskPage.getGraph()));
+                    steinerPoint.typeProperty().setValue(STBTerminalType.STEINER_TERMINAL);
+                    taskPage.getGraph().addVertex(steinerPoint);
+                });
+                KruskallAlgorithm algorithm = new KruskallAlgorithm<>((EuclideanGraph) taskPage.getGraph());
+                algorithm.run();
+                ResultGraphPage page = new ResultGraphPage(algorithm.getResult());
                 page.nameProperty().set("result#" + result.id);
                 page.putProperty("algorithm", "Exact Algorithm (ORLibrary)");
-                page.putProperty("mst wight", "" + result.weightMST);
-                page.putProperty("smt wight", "" + result.weightSMT);
-                result.getPoints().forEach(point -> {
-                    EuclideanTerminal steinerPoint = new EuclideanTerminal(point, IdUtils.getTerminalId(page.getGraph()));
-                    steinerPoint.typeProperty().setValue(STBTerminalType.STEINER_TERMINAL);
-                    page.getGraph().addVertex(steinerPoint);
-                });
+                page.putProperty("mst weight", "" + result.weightMST);
+                page.putProperty("smt weight", "" + result.weightSMT);
                 pages.put(result.id, page);
             } catch (IllegalComponentException e) {
                 e.printStackTrace();

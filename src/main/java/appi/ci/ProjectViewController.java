@@ -18,8 +18,10 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
+import utils.iou.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,8 +51,8 @@ public class ProjectViewController extends TabPane {
     private StringProperty edgeLengthStringProperty;
     private StringProperty graphWeightStringProperty;
 
-    private ChangeListener<Number> edgeLengthListener = (observable, oldValue, newValue) -> edgeLengthStringProperty.set("Length: " + newValue);
-    private ChangeListener<Number> graphWeightListener = (observable, oldValue, newValue) -> graphWeightStringProperty.set("Weight: " + newValue);
+    private ChangeListener<Number> edgeLengthListener = (observable, oldValue, newValue) -> edgeLengthStringProperty.set("Длина: " + newValue);
+    private ChangeListener<Number> graphWeightListener = (observable, oldValue, newValue) -> graphWeightStringProperty.set("Вес: " + newValue);
 
     private ProjectTreeViewController projectTreeViewController;
 
@@ -93,7 +95,7 @@ public class ProjectViewController extends TabPane {
             target.edgeAdditionModeProperty().bind(this.edgeAdditionModeProperty);
             target.restoreProperties();
             target.edgeLengthProperty().addListener(this.edgeLengthListener);
-            if (null != this.graphWeightStringProperty) this.graphWeightStringProperty.set("Weight: " + target.getPage().getGraph().getWeight());
+            if (null != this.graphWeightStringProperty) this.graphWeightStringProperty.set("Вес: " + target.getPage().getGraph().getWeight());
             target.getPage().getGraph().weightProperty().addListener(this.graphWeightListener);
         }
     }
@@ -223,6 +225,38 @@ public class ProjectViewController extends TabPane {
         }
     }
 
+    public void startAnal(AlgorithmType type, int count) {
+        if (null != project.getFile()) {
+            for (int i = 0; i < count; i++) {
+                tabs.forEach((tab, controller) -> {
+                    String result = controller.startAnal(type);
+                    try {
+                        FileUtils.append(
+                                new File(project.getFile().getPath() + "/" + this.project.nameProperty().get() + type.shortName() + ".reslog"),
+                                result
+                        );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }
+    }
+
+    public void savePageAsReport() {
+        if (null != project.getFile() && null != currentPageController.getValue()) {
+            String result = currentPageController.getValue().saveAsReport();
+            try {
+                FileUtils.append(
+                        new File(project.getFile().getPath() + "/" + this.project.nameProperty().get() + "reports.reslog"),
+                        result
+                );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public GraphPagePaneController getCurrentPageController() {
         return currentPageController.getValue();
     }
@@ -302,7 +336,7 @@ public class ProjectViewController extends TabPane {
 
     public void setGraphWeightPropertyFollower(StringProperty property) {
         this.graphWeightStringProperty = property;
-        if (null != this.currentPageController) this.graphWeightStringProperty.set("Weight: " + this.currentPageController.getValue().getPage().getGraph().getWeight());
+        if (null != this.currentPageController) this.graphWeightStringProperty.set("Вес: " + this.currentPageController.getValue().getPage().getGraph().getWeight());
     }
 
     public void setEdgeLengthPropertyFollower(StringProperty property) {

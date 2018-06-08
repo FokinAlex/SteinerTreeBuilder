@@ -13,6 +13,11 @@ public class StringDoubleConverter {
         return Pattern.compile("-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?").matcher(text).matches()? change : null;
     };
 
+    public static final UnaryOperator<TextFormatter.Change> POSITIVE_FILTER = change -> {
+        String text = change.getControlNewText();
+        return Pattern.compile("(([1-9][0-9]*)|0)?(\\.[0-9]*)?").matcher(text).matches()? change : null;
+    };
+
     public static final StringConverter<Double> CONVERTER = new StringConverter<Double>() {
         @Override
         public Double fromString(String value) {

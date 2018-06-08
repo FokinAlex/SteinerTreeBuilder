@@ -1,4 +1,4 @@
-package utils.iou;
+package utils;
 
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;

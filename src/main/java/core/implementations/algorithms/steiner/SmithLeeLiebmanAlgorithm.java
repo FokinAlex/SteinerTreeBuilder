@@ -64,6 +64,7 @@ public class SmithLeeLiebmanAlgorithm<Graph extends EuclideanGraph, Result exten
 
         this.result.getAllVertexes().forEach(terminal -> {
             if (((STBTerminal) terminal).typeProperty().getValue().equals(STBTerminalType.STEINER_TERMINAL)) {
+                // TODO: WTF?
                 if (((STBTerminal) terminal).typeProperty().getValue().equals(STBTerminalType.STEINER_TERMINAL)) {
                     final int[] counter = {0};
                     final EuclideanTerminal[] values = new EuclideanTerminal[3];
