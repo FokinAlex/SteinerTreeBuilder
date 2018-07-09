@@ -1,5 +1,4 @@
 .terminal-background {
-	-fx-fill: rgb(73, 84, 119);
 	-fx-opacity: 0.8;
 	-fx-stroke: null;
 	-fx-stroke-type: inside;
@@ -9,10 +8,12 @@
 }
 
 .terminal-background:simple-terminal {
+	-fx-fill: rgb(73, 84, 119);
 }
 
 .terminal-background:steiner-terminal {
-    -fx-opacity: 0.6;
+	-fx-fill: rgb(170, 100, 100);
+    -fx-opacity: 0.8;
 }
 
 .terminal-background:selected {

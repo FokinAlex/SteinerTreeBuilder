@@ -304,6 +304,33 @@ public class GraphPagePaneController {
         }
     }
 
+    public String startAnal(AlgorithmType type) {
+        String result = this.getPage().nameProperty().get() + "\t";
+        STBAlgorithm algorithm = type.getInstance(this.page.getGraph());
+        long time = System.nanoTime();
+        algorithm.run();
+        result += String.valueOf(System.nanoTime() - time) + "\t";
+        result += String.valueOf(((EuclideanGraph) algorithm.getResult()).getWeight()) + "\t";
+        if (this.isResultPage) {
+            Map<String, String> properties = ((ResultGraphPage) this.page).getProperties();
+            result += properties.get("mst weight") + "\t";
+            result += properties.get("smt weight");
+        }
+        return result;
+    }
+
+    public String saveAsReport() {
+        String result = this.getPage().nameProperty().get() + "\t";
+        if (this.isResultPage) {
+            Map<String, String> properties = ((ResultGraphPage) this.page).getProperties();
+            result += properties.get("nanotime") + "\t";
+            result += properties.get("algorithm") + "\t";
+            result += properties.get("mst weight") + "\t";
+            result += properties.get("smt weight");
+        }
+        return result;
+    }
+
     BooleanProperty selectedTerminalProperty() {
         return this.hasSelectedPoint;
     }

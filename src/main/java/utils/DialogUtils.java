@@ -13,13 +13,13 @@ import java.util.Optional;
 public final class DialogUtils {
 
     private final static Dialog<Pair<Double, Double>> NEW_EUCLIDEAN_TERMINAL_DIALOG = new Dialog() {{
-        this.setTitle("New terminal");
+        this.setTitle("Новый терминал");
         GridPane pane = new GridPane();
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10, 10, 10, 10));
 
-        Label information = new Label("Insert new terminal location");
+        Label information = new Label("Введите координаты вершины");
         pane.add(information, 0,0);
         Label xLabel = new Label("x:");
         pane.add(xLabel, 0,1);
@@ -47,13 +47,13 @@ public final class DialogUtils {
 
     public static String showNameDialog(String oldValue) {
         Dialog<String> dialog = new Dialog();
-        dialog.setTitle("Name dialog");
+        dialog.setTitle("Выбор имени");
         GridPane pane = new GridPane();
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10, 10, 10, 10));
 
-        Label information = new Label("Write new name here:");
+        Label information = new Label("Введите имя:");
         pane.add(information, 0,0);
 
         TextField nameField = new TextField(oldValue);
@@ -70,7 +70,7 @@ public final class DialogUtils {
 
     public static void showResultsDialog(Map<String, String> values) {
         Dialog<String> dialog = new Dialog();
-        dialog.setTitle("Results");
+        dialog.setTitle("Результаты");
         GridPane pane = new GridPane();
         pane.setHgap(10);
         pane.setVgap(10);

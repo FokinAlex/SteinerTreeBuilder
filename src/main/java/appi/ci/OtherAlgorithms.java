@@ -85,7 +85,7 @@ public enum OtherAlgorithms implements STBAlgorithm, AlgorithmType {
     };
 
     public static Map<String, OtherAlgorithms> ALGORITHMS = new HashMap<String, OtherAlgorithms>() {{
-        this.put("Kruskall Algorithm", KRUSKALL_ALGORITHM);
-        this.put("Delaunay Triangulation", DELAUNAY_TRIANGULATION);
+        this.put("Алгоритм Краскала (MST)", KRUSKALL_ALGORITHM);
+        this.put("Триангуляция Делоне", DELAUNAY_TRIANGULATION);
     }};
 }

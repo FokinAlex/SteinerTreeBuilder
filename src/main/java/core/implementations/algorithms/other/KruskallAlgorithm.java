@@ -18,7 +18,7 @@ public class KruskallAlgorithm<Graph extends EuclideanGraph, Result extends Eucl
     public KruskallAlgorithm(Graph graph) {
         super(graph);
         this.result = (Result) AlgorithmsUtils.clone(this.argument);
-        AlgorithmsUtils.clear(this.result);
+//        AlgorithmsUtils.clear(this.result);
     }
 
     @Override

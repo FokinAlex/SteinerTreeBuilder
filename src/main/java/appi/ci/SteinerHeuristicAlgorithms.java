@@ -85,7 +85,7 @@ public enum SteinerHeuristicAlgorithms implements STBHeuristicAlgorithm, Algorit
             return this.algorithm.getResult();
         }
     },
-    SMITH_LEE_LIEBMAN_ALGORITHM {
+    REDUCTIONAL_ALGORITHM {
 
         private SmithLeeLiebmanAlgorithm algorithm;
 
@@ -97,12 +97,12 @@ public enum SteinerHeuristicAlgorithms implements STBHeuristicAlgorithm, Algorit
 
         @Override
         public String shortName() {
-            return "SLL";
+            return "RA";
         }
 
         @Override
         public String fullName() {
-            return "Smith-Lee-Liebman Algorithm";
+            return "Reductional Algorithm";
         }
 
         @Override
@@ -122,8 +122,8 @@ public enum SteinerHeuristicAlgorithms implements STBHeuristicAlgorithm, Algorit
     };
 
     public static Map<String, SteinerHeuristicAlgorithms> ALGORITHMS = new HashMap<String, SteinerHeuristicAlgorithms>() {{
-        this.put("Incremental Optimization Algorithm", INCREMENTAL_OPTIMIZATION_ALGORITHM);
-        this.put("Gravitational Algorithm", GRAVITATIONAL_ALGORITHM);
-        this.put("Smith/Lee/Liebman Algorithm", SMITH_LEE_LIEBMAN_ALGORITHM);
+        this.put("Алгоритм добавочной оптимизации", INCREMENTAL_OPTIMIZATION_ALGORITHM);
+        this.put("Гравитационный алгоритм", GRAVITATIONAL_ALGORITHM);
+        this.put("Редукционный алгоритм", REDUCTIONAL_ALGORITHM);
     }};
 }
