@@ -225,6 +225,16 @@ public class ProjectViewController extends TabPane {
         }
     }
 
+    public boolean getHeh(File file) {
+        try {
+            ORLibraryAccess.getHehs(file);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void startAnal(AlgorithmType type, int count) {
         if (null != project.getFile()) {
             for (int i = 0; i < count; i++) {

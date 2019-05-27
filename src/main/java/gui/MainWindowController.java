@@ -311,6 +311,12 @@ public class MainWindowController {
     }
 
     @FXML
+    public boolean getHehAction() {
+        setLeftStatus("Get heh action");
+        return this.projectViewController.getHeh(FileChooserUtils.getORLibraryFileChooser(ProjectController.getDirectory()).showOpenDialog(null));
+    }
+
+    @FXML
     private boolean deleteTerminalAction() {
         setLeftStatus("Delete terminal action");
         this.projectViewController.getCurrentPageController().deleteSelectedPoint();

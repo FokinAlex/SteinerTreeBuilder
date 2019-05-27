@@ -60,6 +60,7 @@
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#importORLTasksAction" text="OR-Library Tasks" />
                         <MenuItem mnemonicParsing="false" onAction="#importORLResultsAction" text="OR-Library Results" />
+                        <MenuItem mnemonicParsing="false" onAction="#getHehAction" text="Get heh from OR-Library" />
                     </items>
                   </Menu>
                   <MenuItem fx:id="renameProjectMI" mnemonicParsing="false" onAction="#renameProjectAction" text="Переименовать" />
