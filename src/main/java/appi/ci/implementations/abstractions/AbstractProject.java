@@ -1,19 +1,23 @@
 package appi.ci.implementations.abstractions;
 
 import appi.ci.interfaces.Project;
+import core.implementations.GraphMultiPageScheme;
 import core.implementations.GraphPage;
-import core.implementations.GraphSinglePageScheme;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.io.File;
 import java.util.List;
 
-public abstract class AbstractProject<Scheme extends GraphSinglePageScheme<Page>, Page extends GraphPage> implements Project<Scheme, Page> {
+public abstract class AbstractProject<Scheme extends GraphMultiPageScheme<Page>, Page extends GraphPage> implements Project<Scheme, Page> {
 
     protected Scheme scheme;
     protected File file;
+    protected StringProperty nameProperty;
 
-    public AbstractProject(Scheme scheme) {
+    public AbstractProject(Scheme scheme, String name) {
         this.scheme = scheme;
+        this.nameProperty = new SimpleStringProperty(name);
     }
 
     @Override
@@ -50,5 +54,10 @@ public abstract class AbstractProject<Scheme extends GraphSinglePageScheme<Page>
     @Override
     public boolean setCurrentPage(Page page) {
         return this.scheme.setCurrentPage(page);
+    }
+
+    @Override
+    public StringProperty nameProperty() {
+        return nameProperty;
     }
 }

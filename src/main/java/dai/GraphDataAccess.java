@@ -14,26 +14,24 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public enum PageDataAccess {
+public enum GraphDataAccess {
     // TODO: this need some fragmentation when more then one
     EUCLIDEAN {
         @Override
         public JSONObject toJson(STBGraph graph) {
-            JSONObject root = new JSONObject();
             JSONObject jGraph = new JSONObject();
             JSONArray jTerminals = new JSONArray();
             JSONArray jEdges = new JSONArray();
 
-            root.put("graph", jGraph);
             jGraph.put("terminals", jTerminals);
             graph.getAllVertexes().forEach(terminal -> {
                 JSONObject jTerminal = new JSONObject();
                 JSONObject jTerminalsValues = new JSONObject();
                 JSONObject jTerminalLocation = new JSONObject();
-                jTerminalLocation.put("x", ((EuclideanTerminal) terminal).getLocation().getXProperty().get());
-                jTerminalLocation.put("y", ((EuclideanTerminal) terminal).getLocation().getYProperty().get());
+                jTerminalLocation.put("x", ((EuclideanTerminal) terminal).getLocation().xProperty().get());
+                jTerminalLocation.put("y", ((EuclideanTerminal) terminal).getLocation().yProperty().get());
                 jTerminalsValues.put("id", ((EuclideanTerminal) terminal).getId());
-                jTerminalsValues.put("type", ((EuclideanTerminal) terminal).type.toString());
+                jTerminalsValues.put("type", ((EuclideanTerminal) terminal).typeProperty().getValue().toString());
                 jTerminalsValues.put("location", jTerminalLocation);
                 jTerminal.put("terminal", jTerminalsValues);
                 jTerminals.add(jTerminal);
@@ -50,7 +48,7 @@ public enum PageDataAccess {
                 jEdge.put("edge", jEdgesValues);
                 jEdges.add(jEdge);
             });
-            return root;
+            return jGraph;
         }
 
         @Override
@@ -72,7 +70,7 @@ public enum PageDataAccess {
                 Double jTerminalLocationX = (Double) jTerminalLocation.get("x");
                 Double jTerminalLocationY = (Double) jTerminalLocation.get("y");
                 currentTerminal = new EuclideanTerminal(new EuclideanLocation(jTerminalLocationX, jTerminalLocationY), jTerminalId);
-                currentTerminal.type = STBTerminalType.valueOf(jTerminalType);
+                currentTerminal.typeProperty().setValue(STBTerminalType.valueOf(jTerminalType));
                 terminals.add(currentTerminal);
             }
             JSONArray jEdges = (JSONArray) jGraph.get("edges");

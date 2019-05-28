@@ -2,6 +2,8 @@ package core.implementations;
 
 import core.exceptions.IllegalComponentException;
 import core.interfaces.*;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,10 +11,12 @@ import java.util.List;
 public class GraphPage<Graph extends STBGraph, Component extends STBComponent> implements STBPage<Component> {
 
     private Graph graph;
+    private StringProperty name = new SimpleStringProperty();
 
     public GraphPage(Graph graph) throws IllegalComponentException {
         if (graph == null) throw new IllegalComponentException("GraphPage's graph can not be null", null);
         this.graph = graph;
+        this.name.set(this.graph.getClass().getSimpleName() + this.graph.hashCode());
     }
 
     @Deprecated
@@ -47,5 +51,10 @@ public class GraphPage<Graph extends STBGraph, Component extends STBComponent> i
                     this.graph.removeEdges(((STBGraph) component).getAllEdges());
         }
         return false;
+    }
+
+    @Override
+    public StringProperty nameProperty() {
+        return this.name;
     }
 }

@@ -15,12 +15,12 @@ public abstract class AbstractLocation implements STBLocation {
     }
 
     @Override
-    public DoubleProperty getXProperty() {
+    public DoubleProperty xProperty() {
         return this.xProperty;
     }
 
     @Override
-    public DoubleProperty getYProperty() {
+    public DoubleProperty yProperty() {
         return this.yProperty;
     }
 
